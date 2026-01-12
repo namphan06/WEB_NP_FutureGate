@@ -1,0 +1,541 @@
+/* ========================================
+   Job Form Styles - Clean & Balanced
+   ======================================== */
+
+/* Page Container */
+.job-form-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Hero Header */
+.job-form-hero {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    padding: 2rem 0 3.5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.job-form-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+    opacity: 0.3;
+}
+
+.job-form-hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.job-form-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.job-form-title-icon {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.625rem;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+}
+
+.job-form-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9375rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Form Container */
+.job-form-container {
+    max-width: 900px;
+    margin: -2rem auto 0;
+    padding: 0 1rem 2rem;
+}
+
+/* Section Card */
+.job-form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+/* Section Header */
+.job-form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.job-form-section-header h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #212f3f;
+    margin: 0;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    padding: 0.375rem;
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    color: white;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+/* Form Labels */
+.form-label-required::after {
+    content: ' *';
+    color: #EF5350;
+    font-weight: bold;
+}
+
+/* Chips / Tags Selection */
+.chip-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.625rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    border: 1.5px solid #dee2e6;
+    background: white;
+    color: #495057;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 40px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.chip:hover {
+    border-color: #1E88E5;
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(30, 136, 229, 0.15);
+}
+
+.chip-selected {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    border-color: #1E88E5;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(30, 136, 229, 0.3);
+}
+
+.chip-selected:hover {
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(30, 136, 229, 0.4);
+}
+
+.chip-selected svg {
+    animation: checkmark-appear 0.3s ease-out;
+}
+
+@keyframes checkmark-appear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Chip More Toggle */
+.chip-more {
+    margin-top: 0.75rem;
+}
+
+.chip-more-toggle {
+    color: #1E88E5;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.chip-more-toggle:hover {
+    background: rgba(30, 136, 229, 0.1);
+}
+
+/* Salary Grid */
+.salary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 160px;
+    gap: 0.875rem;
+}
+
+/* Input with Button */
+.input-with-button {
+    display: grid;
+    grid-template-columns: 1fr 46px;
+    gap: 0.5rem;
+    align-items: start;
+}
+
+.input-with-button .form-input,
+.input-with-button .form-textarea {
+    grid-column: 1;
+    width: 100%;
+}
+
+.btn-icon {
+    grid-column: 2;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1E88E5;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+    stroke-width: 2.5;
+    flex-shrink: 0;
+}
+
+.btn-icon:hover {
+    background: #1565C0;
+    transform: translateY(-1px);
+}
+
+.btn-icon:active {
+    transform: translateY(0);
+}
+
+/* Item List */
+.item-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.item-card:hover {
+    border-color: #1E88E5;
+    background: rgba(30, 136, 229, 0.02);
+}
+
+.item-text {
+    flex: 1;
+    color: #212f3f;
+    line-height: 1.5;
+    font-size: 0.9375rem;
+}
+
+.item-remove {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #EF5350;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.item-remove:hover {
+    background: rgba(239, 83, 80, 0.1);
+    transform: scale(1.1);
+}
+
+/* Tag List */
+.tag-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(30, 136, 229, 0.25);
+}
+
+.tag-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tag-remove:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.15);
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    padding: 0.875rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #1E88E5;
+}
+
+.checkbox-title {
+    display: block;
+    font-weight: 600;
+    color: #212f3f;
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
+}
+
+.checkbox-description {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Form Actions */
+.job-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.875rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    margin-top: 1.5rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    min-width: 130px;
+}
+
+/* Custom Scrollbar */
+.chip-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chip-container::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 50px;
+}
+
+.chip-container::-webkit-scrollbar-thumb {
+    background: #1E88E5;
+    border-radius: 50px;
+}
+
+.chip-container::-webkit-scrollbar-thumb:hover {
+    background: #1565C0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .job-form-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .job-form-page {
+        padding-bottom: 1rem;
+    }
+
+    .job-form-hero {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .job-form-title {
+        font-size: 1.25rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .job-form-title-icon {
+        font-size: 1.125rem;
+    }
+
+    .job-form-subtitle {
+        font-size: 0.875rem;
+        padding: 0 0.5rem;
+    }
+
+    .job-form-section {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-form-section-header h2 {
+        font-size: 1rem;
+    }
+
+    .section-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .job-form-actions {
+        flex-direction: column-reverse;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .job-form-actions .btn {
+        width: 100%;
+    }
+
+    .btn-lg {
+        padding: 0.75rem;
+        min-width: auto;
+    }
+
+    .input-with-button {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .input-with-button .form-input,
+    .input-with-button .form-textarea {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .input-with-button .btn-icon {
+        grid-column: 1;
+        grid-row: 2;
+        width: 100%;
+        height: 44px;
+    }
+
+    .salary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chip-container {
+        max-height: 240px;
+        padding: 0.875rem;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .chip {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.75rem;
+        min-height: 38px;
+    }
+}
+
+@media (max-width: 480px) {
+    .job-form-container {
+        padding: 0 0.75rem 1.5rem;
+    }
+
+    .job-form-section {
+        padding: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .job-form-section-header {
+        gap: 0.5rem;
+    }
+
+    .job-form-section-header h2 {
+        font-size: 0.9375rem;
+    }
+}
