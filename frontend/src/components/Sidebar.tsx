@@ -92,6 +92,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     items: [
                         { label: 'Đăng tin tuyển dụng', path: '/employer/jobs/create' },
                         { label: 'Tin đã đăng', path: '/employer/jobs' },
+                        { label: 'Việc làm liên kết', path: '/employer/partnerships' },
+                        { label: 'Đối tác trường học', path: '/employer/schools' },
                         { label: 'Ứng viên đã ứng tuyển', path: '/employer/applicants' },
                         { label: 'Ứng viên đã lưu', path: '/employer/saved-candidates' },
                     ]

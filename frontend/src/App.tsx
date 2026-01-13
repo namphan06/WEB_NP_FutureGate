@@ -28,6 +28,8 @@ const ViewCVPage = lazy(() => import('./pages/employer/ViewCVPage'));
 const SearchCandidatesPage = lazy(() => import('./pages/employer/SearchCandidatesPage'));
 const InterviewSchedulePage = lazy(() => import('./pages/employer/InterviewSchedulePage'));
 const InterviewDetailPage = lazy(() => import('./pages/employer/InterviewDetailPage'));
+const PartnershipJobsPage = lazy(() => import('./pages/employer/PartnershipJobsPage'));
+const EmployerSchoolsPage = lazy(() => import('./pages/employer/EmployerSchoolsPage'));
 
 // Admin Pages
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
@@ -241,6 +243,24 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <InterviewDetailPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/employer/partnerships"
+              element={
+                <PrivateRoute>
+                  <PartnershipJobsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/employer/schools"
+              element={
+                <PrivateRoute>
+                  <EmployerSchoolsPage />
                 </PrivateRoute>
               }
             />

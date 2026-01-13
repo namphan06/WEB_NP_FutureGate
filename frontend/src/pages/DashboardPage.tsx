@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { FiBriefcase, FiUsers, FiDollarSign, FiUser, FiClock, FiPlusCircle, FiCalendar } from 'react-icons/fi';
+import { FiBriefcase, FiUsers, FiDollarSign, FiUser, FiClock, FiPlusCircle, FiCalendar, FiLink } from 'react-icons/fi';
 import { supabase } from '../lib/supabase';
 
 // Types
@@ -369,6 +369,14 @@ export default function DashboardPage() {
                             >
                                 <FiUsers size={20} />
                                 Quản lý ứng viên
+                            </button>
+                            <button
+                                onClick={() => navigate('/employer/partnerships')}
+                                className="btn btn-outline"
+                                style={{ justifyContent: 'flex-start', padding: '0.875rem 1.25rem', borderRadius: '14px', gap: '0.75rem', fontSize: '1rem', fontWeight: 700, border: '1px solid var(--color-divider)' }}
+                            >
+                                <FiLink size={20} />
+                                Liên kết đối tác
                             </button>
                         </div>
                     </div>
