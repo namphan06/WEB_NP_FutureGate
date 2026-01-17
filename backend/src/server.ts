@@ -11,6 +11,7 @@ import profileRoutes from './routes/profile.routes.js';
 import cvRoutes from './routes/cv.routes.js';
 import interviewRoutes from './routes/interview.routes.js';
 import chatRoutes from './routes/chat.routes.js';
+import newsRoutes from './routes/news.routes.js';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/cv', cvRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/news', newsRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -55,3 +55,44 @@ export interface Job {
     status: 'pending' | 'approved' | 'rejected' | 'closed';
     profiles?: Profile;
 }
+
+// Career News types
+export type NewsCategory = 'market_trends' | 'company_news' | 'industry_insights' | 'career_tips' | 'events';
+export type NewsStatus = 'draft' | 'published' | 'archived';
+
+export interface CareerNews {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    title: string;
+    slug: string | null;
+    excerpt: string | null;
+    content: string;
+    cover_image_url: string | null;
+    category: NewsCategory;
+    tags: string[];
+    related_company_ids: string[];
+    status: NewsStatus;
+    is_featured: boolean;
+    is_pinned: boolean;
+    author_id: string | null;
+    view_count: number;
+    meta_title: string | null;
+    meta_description: string | null;
+    // Joined data
+    related_companies?: Profile[];
+}
+
+export const NEWS_CATEGORIES: Record<NewsCategory, string> = {
+    market_trends: 'Xu hướng thị trường',
+    company_news: 'Tin công ty',
+    industry_insights: 'Phân tích ngành nghề',
+    career_tips: 'Mẹo nghề nghiệp',
+    events: 'Sự kiện tuyển dụng'
+};
+
+export const NEWS_STATUS_LABELS: Record<NewsStatus, string> = {
+    draft: 'Bản nháp',
+    published: 'Đã xuất bản',
+    archived: 'Đã lưu trữ'
+};

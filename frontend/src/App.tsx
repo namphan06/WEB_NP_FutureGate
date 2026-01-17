@@ -35,6 +35,7 @@ const EmployerSchoolsPage = lazy(() => import('./pages/employer/EmployerSchoolsP
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
 const AdminJobsPage = lazy(() => import('./pages/admin/AdminJobsPage'));
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
+const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 
 // Layout
 import Navbar from './components/Navbar';
@@ -289,6 +290,15 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <AdminUsersPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/admin/news"
+              element={
+                <PrivateRoute>
+                  <AdminNewsPage />
                 </PrivateRoute>
               }
             />
