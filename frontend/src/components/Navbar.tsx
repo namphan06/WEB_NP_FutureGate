@@ -194,6 +194,26 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                         <FiFileText size={18} />
                                         Tin tức
                                     </Link>
+                                    <Link
+                                        to="/admin/courses"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.625rem',
+                                            padding: '0.625rem 1rem',
+                                            fontWeight: 600,
+                                            fontSize: '0.9rem',
+                                            color: 'var(--color-text)',
+                                            textDecoration: 'none',
+                                            borderRadius: '12px',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <FiList size={18} />
+                                        Khoá học
+                                    </Link>
                                 </div>
                             ) : profile?.role === 'employer' ? (
                                 // ============ EMPLOYER MENU ============

@@ -96,3 +96,64 @@ export const NEWS_STATUS_LABELS: Record<NewsStatus, string> = {
     published: 'Đã xuất bản',
     archived: 'Đã lưu trữ'
 };
+
+// Course types
+export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
+export type CourseStatus = 'draft' | 'published' | 'archived';
+
+export interface CourseCategory {
+    id: string;
+    created_at: string;
+    name: string;
+    slug: string | null;
+    description: string | null;
+    icon: string | null;
+    color: string;
+    order: number;
+    is_active: boolean;
+}
+
+export interface Course {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    title: string;
+    slug: string | null;
+    description: string | null;
+    thumbnail_url: string | null;
+    category_id: string | null;
+    level: CourseLevel;
+    tags: string[];
+    duration_minutes: number;
+    status: CourseStatus;
+    is_featured: boolean;
+    author_id: string | null;
+    view_count: number;
+    // Joined data
+    category?: CourseCategory;
+    lessons?: CourseLesson[];
+}
+
+export interface CourseLesson {
+    id: string;
+    created_at: string;
+    course_id: string;
+    title: string;
+    description: string | null;
+    youtube_url: string;
+    order: number;
+    duration_minutes: number;
+    is_preview: boolean;
+}
+
+export const COURSE_LEVELS: Record<CourseLevel, string> = {
+    beginner: 'Cơ bản',
+    intermediate: 'Trung cấp',
+    advanced: 'Nâng cao'
+};
+
+export const COURSE_STATUS_LABELS: Record<CourseStatus, string> = {
+    draft: 'Bản nháp',
+    published: 'Đã xuất bản',
+    archived: 'Đã lưu trữ'
+};
