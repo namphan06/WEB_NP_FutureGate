@@ -64,8 +64,9 @@ router.get('/:id/followers', async (req, res) => {
 
         const { data, error, count } = await supabase
             .from('company_followers')
-            .select('*, profiles:follower_id(*)', { count: 'exact' })
-            .eq('company_id', id);
+            .select('*, profiles:candidate_id(*)', { count: 'exact' })
+            .eq('employer_id', id)
+            .eq('followed_by', 'candidate');
 
         if (error) throw error;
 
@@ -90,8 +91,9 @@ router.post('/:id/follow', authMiddleware, async (req, res) => {
         const { data: existing } = await supabase
             .from('company_followers')
             .select('id')
-            .eq('company_id', id)
-            .eq('follower_id', userId)
+            .eq('employer_id', id)
+            .eq('candidate_id', userId)
+            .eq('followed_by', 'candidate')
             .maybeSingle();
 
         if (existing) {
@@ -112,8 +114,9 @@ router.post('/:id/follow', authMiddleware, async (req, res) => {
             const { error } = await supabase
                 .from('company_followers')
                 .insert({
-                    company_id: id,
-                    follower_id: userId
+                    employer_id: id,
+                    candidate_id: userId,
+                    followed_by: 'candidate'
                 });
 
             if (error) throw error;

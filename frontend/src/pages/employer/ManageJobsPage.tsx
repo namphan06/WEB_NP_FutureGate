@@ -146,10 +146,10 @@ export default function ManageJobsPage() {
                                             <FiUsers size={16} />
                                             Ứng viên ({job.applicants?.length || 0})
                                         </Link>
-                                        <button className="btn btn-sm btn-outline">
+                                        <Link to={`/employer/jobs/${job.id}/edit`} className="btn btn-sm btn-outline">
                                             <FiEdit size={16} />
                                             Sửa
-                                        </button>
+                                        </Link>
                                         <button
                                             onClick={() => handleDelete(job.id)}
                                             className="btn btn-sm"

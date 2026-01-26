@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Navigate } from 'react-router-dom';
-import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi';
 
 interface CandidateMetadata {
     bio?: string;
@@ -39,6 +39,7 @@ export default function SearchCandidatesPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [savedIds, setSavedIds] = useState<string[]>([]);
 
     // Only employers can access this page
     if (profile?.role !== 'employer') {
@@ -47,7 +48,23 @@ export default function SearchCandidatesPage() {
 
     useEffect(() => {
         fetchCandidates();
-    }, []);
+        fetchSavedIds();
+    }, [profile]);
+
+    const fetchSavedIds = async () => {
+        if (!profile) return;
+        try {
+            const { data, error } = await supabase
+                .from('company_followers')
+                .select('candidate_id')
+                .eq('employer_id', profile.id)
+                .eq('followed_by', 'employer');
+            if (error) throw error;
+            setSavedIds(data?.map(d => d.candidate_id) || []);
+        } catch (err) {
+            console.error('Error fetching saved ids:', err);
+        }
+    };
 
     const fetchCandidates = async () => {
         try {
@@ -63,19 +80,54 @@ export default function SearchCandidatesPage() {
                 throw error;
             }
 
-            console.log('Fetched candidates:', data);
-
             // Filter candidates with security = true
             const securedCandidates = data?.filter(candidate =>
                 candidate.metadata?.security === true
             ) || [];
 
-            console.log('Candidates with security enabled:', securedCandidates);
             setCandidates(securedCandidates);
         } catch (error) {
             console.error('Error fetching candidates:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleToggleSave = async (e: React.MouseEvent, candidateId: string) => {
+        e.stopPropagation();
+        if (!profile || profile.role !== 'employer') return;
+
+        try {
+            const isSaved = savedIds.includes(candidateId);
+
+            if (isSaved) {
+                // Remove from company_followers
+                const { error } = await supabase
+                    .from('company_followers')
+                    .delete()
+                    .eq('employer_id', profile.id)
+                    .eq('candidate_id', candidateId)
+                    .eq('followed_by', 'employer');
+
+                if (error) throw error;
+                setSavedIds(prev => prev.filter(id => id !== candidateId));
+            } else {
+                // Add to company_followers
+                const { error } = await supabase
+                    .from('company_followers')
+                    .insert({
+                        employer_id: profile.id,
+                        candidate_id: candidateId,
+                        followed_by: 'employer'
+                    });
+
+                if (error) throw error;
+                setSavedIds(prev => [...prev, candidateId]);
+            }
+
+            alert(isSaved ? 'Đã bỏ lưu' : 'Đã lưu ứng viên');
+        } catch (error: any) {
+            alert('Lỗi: ' + error.message);
         }
     };
 
@@ -251,12 +303,28 @@ export default function SearchCandidatesPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Expand Icon */}
-                                            <div style={{
-                                                padding: 'var(--spacing-sm)',
-                                                color: 'var(--color-primary)'
-                                            }}>
-                                                {isExpanded ? <FiChevronUp size={24} /> : <FiChevronDown size={24} />}
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-sm">
+                                                <button
+                                                    className="btn btn-sm"
+                                                    style={{
+                                                        minWidth: 'auto',
+                                                        padding: '0.5rem',
+                                                        background: savedIds.includes(candidate.id) ? 'var(--color-primary)' : 'transparent',
+                                                        color: savedIds.includes(candidate.id) ? 'white' : 'var(--color-primary)',
+                                                        border: '1px solid var(--color-primary)'
+                                                    }}
+                                                    onClick={(e) => handleToggleSave(e, candidate.id)}
+                                                    title={savedIds.includes(candidate.id) ? 'Bỏ lưu' : 'Lưu ứng viên'}
+                                                >
+                                                    <FiHeart size={18} fill={savedIds.includes(candidate.id) ? 'currentColor' : 'none'} />
+                                                </button>
+                                                <div style={{
+                                                    padding: 'var(--spacing-sm)',
+                                                    color: 'var(--color-primary)'
+                                                }}>
+                                                    {isExpanded ? <FiChevronUp size={24} /> : <FiChevronDown size={24} />}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

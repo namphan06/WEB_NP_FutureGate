@@ -24,8 +24,10 @@ const AppliedJobsPage = lazy(() => import('./pages/candidate/AppliedJobsPage'));
 const CreateJobPage = lazy(() => import('./pages/employer/CreateJobPage'));
 const EditJobPage = lazy(() => import('./pages/employer/EditJobPage'));
 const ManageJobsPage = lazy(() => import('./pages/employer/ManageJobsPage'));
+const JobApplicantsPage = lazy(() => import('./pages/employer/JobApplicantsPage'));
 const ViewCVPage = lazy(() => import('./pages/employer/ViewCVPage'));
 const SearchCandidatesPage = lazy(() => import('./pages/employer/SearchCandidatesPage'));
+const SavedCandidatesPage = lazy(() => import('./pages/employer/SavedCandidatesPage'));
 const InterviewSchedulePage = lazy(() => import('./pages/employer/InterviewSchedulePage'));
 const InterviewDetailPage = lazy(() => import('./pages/employer/InterviewDetailPage'));
 const PartnershipJobsPage = lazy(() => import('./pages/employer/PartnershipJobsPage'));
@@ -198,6 +200,15 @@ function AppRoutes() {
             />
 
             <Route
+              path="/employer/jobs/:jobId/applicants"
+              element={
+                <PrivateRoute>
+                  <JobApplicantsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
               path="/employer/jobs/create"
               element={
                 <PrivateRoute>
@@ -229,6 +240,24 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <SearchCandidatesPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/employer/candidates/saved"
+              element={
+                <PrivateRoute>
+                  <SavedCandidatesPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/employer/saved-candidates"
+              element={
+                <PrivateRoute>
+                  <SavedCandidatesPage />
                 </PrivateRoute>
               }
             />
