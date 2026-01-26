@@ -30,6 +30,7 @@ const InterviewSchedulePage = lazy(() => import('./pages/employer/InterviewSched
 const InterviewDetailPage = lazy(() => import('./pages/employer/InterviewDetailPage'));
 const PartnershipJobsPage = lazy(() => import('./pages/employer/PartnershipJobsPage'));
 const EmployerSchoolsPage = lazy(() => import('./pages/employer/EmployerSchoolsPage'));
+const InternEvaluationPage = lazy(() => import('./pages/employer/InternEvaluationPage'));
 
 // Admin Pages
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
@@ -37,6 +38,7 @@ const AdminJobsPage = lazy(() => import('./pages/admin/AdminJobsPage'));
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
 const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
+const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 
 // Layout
 import Navbar from './components/Navbar';
@@ -259,10 +261,28 @@ function AppRoutes() {
             />
 
             <Route
+              path="/employer/school-requests"
+              element={
+                <PrivateRoute>
+                  <EmployerSchoolsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
               path="/employer/schools"
               element={
                 <PrivateRoute>
                   <EmployerSchoolsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/employer/evaluations"
+              element={
+                <PrivateRoute>
+                  <InternEvaluationPage />
                 </PrivateRoute>
               }
             />
@@ -309,6 +329,15 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <AdminCoursesPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/admin/analytics"
+              element={
+                <PrivateRoute>
+                  <AdminAnalyticsPage />
                 </PrivateRoute>
               }
             />

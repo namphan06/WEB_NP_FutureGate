@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { FiX, FiMapPin, FiClock, FiMail, FiPhone, FiDollarSign, FiCalendar, FiSearch, FiFilter, FiBriefcase, FiLink } from 'react-icons/fi';
+import { X, MapPin, Clock, Mail, Phone, DollarSign, Calendar, Search, Filter, Briefcase, Link as LinkIcon, Target, BarChart3, Gem, Tags } from 'lucide-react';
 import { format } from 'date-fns';
 import { Navigate } from 'react-router-dom';
 
@@ -22,6 +22,7 @@ interface Job {
     employer?: any;
     school?: any;
     type: 'regular' | 'partnership';
+    metadata?: any; // Include metadata object for accessing additional fields
 }
 
 export default function AdminJobsPage() {
@@ -56,8 +57,18 @@ export default function AdminJobsPage() {
 
                 const jobsWithEmployer = await Promise.all(
                     (jobsData || []).map(async (job) => {
-                        const { data: employer } = await supabase.from('profiles').select('*').eq('id', job.employer_id).single();
-                        return { ...job, employer, type: 'regular' as const };
+                        const { data: employer } = await supabase.from('profiles').select('*').eq('id', job.creator_id).single();
+                        return {
+                            ...job,
+                            employer,
+                            type: 'regular' as const,
+                            title: job.metadata?.title || 'Untitled',
+                            location: job.metadata?.work_locations?.[0] || job.metadata?.working_regions?.[0] || 'N/A',
+                            salary_min: job.metadata?.salary?.min,
+                            salary_max: job.metadata?.salary?.max,
+                            description: job.metadata?.job_description?.join('\n') || 'N/A',
+                            requirements: job.metadata?.candidate_requirements?.join('\n') || 'N/A'
+                        };
                     })
                 );
                 setJobs(jobsWithEmployer);
@@ -74,7 +85,20 @@ export default function AdminJobsPage() {
                             supabase.from('profiles').select('*').eq('id', job.school_id).single(),
                             supabase.from('profiles').select('*').eq('id', job.employer_id).single()
                         ]);
-                        return { ...job, school: schoolRes.data, employer: employerRes.data, type: 'partnership' as const, status: job.admin_status };
+                        return {
+                            ...job,
+                            school: schoolRes.data,
+                            employer: employerRes.data,
+                            type: 'partnership' as const,
+                            status: job.admin_status,
+                            // Partnership jobs also have metadata structure
+                            title: job.metadata?.title || job.title || 'Untitled',
+                            location: job.metadata?.work_locations?.[0] || job.metadata?.working_regions?.[0] || job.location || 'N/A',
+                            salary_min: job.metadata?.salary?.min || job.salary_min,
+                            salary_max: job.metadata?.salary?.max || job.salary_max,
+                            description: job.metadata?.job_description?.join('\n') || job.description || 'N/A',
+                            requirements: job.metadata?.candidate_requirements?.join('\n') || job.requirements || 'N/A'
+                        };
                     })
                 );
                 setJobs(jobsWithInfo);
@@ -131,7 +155,10 @@ export default function AdminJobsPage() {
 
     const formatSalary = (min?: number, max?: number) => {
         if (!min && !max) return 'Thỏa thuận';
-        if (min && max) return `${(min / 1000000).toFixed(0)} - ${(max / 1000000).toFixed(0)} triệu VNĐ`;
+        // Salary values are already in millions (e.g., 5 = 5 triệu VNĐ)
+        if (min && max) return `${min.toFixed(0)} - ${max.toFixed(0)} triệu VNĐ`;
+        if (min) return `Từ ${min.toFixed(0)} triệu VNĐ`;
+        if (max) return `Đến ${max.toFixed(0)} triệu VNĐ`;
         return 'Thỏa thuận';
     };
 
@@ -175,7 +202,7 @@ export default function AdminJobsPage() {
             <div className="card" style={{ padding: '1.5rem', borderRadius: '24px', border: '1px solid #E2E8F0', marginBottom: '2.5rem', background: 'white' }}>
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
-                        <FiSearch style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                        <Search size={18} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
                         <input
                             type="text"
                             className="form-input"
@@ -186,7 +213,7 @@ export default function AdminJobsPage() {
                         />
                     </div>
                     <div style={{ width: '220px', position: 'relative' }}>
-                        <FiFilter style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                        <Filter size={18} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
                         <select
                             className="form-select"
                             style={{ paddingLeft: '3rem', height: '54px', borderRadius: '16px', fontWeight: 600 }}
@@ -209,7 +236,7 @@ export default function AdminJobsPage() {
                 </div>
             ) : filteredJobs.length === 0 ? (
                 <div className="card" style={{ textAlign: 'center', padding: '5rem', borderRadius: '24px', border: '1px solid #E2E8F0' }}>
-                    <FiBriefcase size={60} style={{ color: '#E2E8F0', marginBottom: '1.5rem' }} />
+                    <Briefcase size={60} style={{ color: '#E2E8F0', marginBottom: '1.5rem' }} />
                     <h3 style={{ color: '#1E293B', marginBottom: '0.5rem' }}>Không tìm thấy tin nào</h3>
                     <p style={{ color: '#64748B' }}>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
                 </div>
@@ -225,7 +252,7 @@ export default function AdminJobsPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                     <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: activeTab === 'regular' ? '#3B82F6' : '#8B5CF6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-                                        {activeTab === 'regular' ? <FiBriefcase /> : <FiLink />}
+                                        {activeTab === 'regular' ? <Briefcase size={24} /> : <LinkIcon size={24} />}
                                     </div>
                                     <div>
                                         <div style={{
@@ -254,16 +281,16 @@ export default function AdminJobsPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <FiMapPin style={{ color: '#3B82F6' }} /> {job.location || 'N/A'}
+                                    <MapPin size={16} style={{ color: '#3B82F6' }} /> {job.location || 'N/A'}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <FiDollarSign style={{ color: '#10B981' }} /> {formatSalary(job.salary_min, job.salary_max)}
+                                    <DollarSign size={16} style={{ color: '#10B981' }} /> {formatSalary(job.salary_min, job.salary_max)}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <FiCalendar /> {format(new Date(job.created_at), 'dd/MM/yyyy')}
+                                    <Calendar size={16} /> {format(new Date(job.created_at), 'dd/MM/yyyy')}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <FiClock /> {job.type === 'regular' ? 'Full-time' : 'Liên kết'}
+                                    <Clock size={16} /> {job.type === 'regular' ? 'Full-time' : 'Liên kết'}
                                 </div>
                             </div>
 
@@ -285,7 +312,7 @@ export default function AdminJobsPage() {
                                             style={{ color: '#EF4444', borderColor: '#FEE2E2', background: '#FEF2F2', padding: '0 1rem', borderRadius: '12px' }}
                                             disabled={actionLoading}
                                         >
-                                            <FiX size={20} />
+                                            <X size={20} />
                                         </button>
                                     </>
                                 )}
@@ -306,9 +333,9 @@ export default function AdminJobsPage() {
                             </div>
                             <h2 style={{ fontSize: '2.5rem', fontWeight: 900, margin: 0, lineHeight: 1.2 }}>{selectedJob.title}</h2>
                             <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem', opacity: 0.8, fontSize: '1rem' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FiMapPin /> {selectedJob.location}</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FiDollarSign /> {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FiCalendar /> {format(new Date(selectedJob.created_at), 'dd/MM/yyyy')}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={18} /> {selectedJob.location}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><DollarSign size={18} /> {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Calendar size={18} /> {format(new Date(selectedJob.created_at), 'dd/MM/yyyy')}</span>
                             </div>
                         </div>
 
@@ -319,10 +346,147 @@ export default function AdminJobsPage() {
                                         <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>Mô tả công việc</h3>
                                         <div style={{ lineHeight: 1.8, color: '#475569', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.description}</div>
                                     </section>
-                                    <section>
+
+                                    <section style={{ marginBottom: '2.5rem' }}>
                                         <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>Yêu cầu ứng viên</h3>
                                         <div style={{ lineHeight: 1.8, color: '#475569', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.requirements}</div>
                                     </section>
+
+                                    {/* Additional Job Details */}
+                                    {selectedJob.metadata && (
+                                        <>
+                                            {/* Fields/Lĩnh vực */}
+                                            {selectedJob.metadata.fields && selectedJob.metadata.fields.length > 0 && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <Target size={24} style={{ color: '#3B82F6' }} /> Lĩnh vực
+                                                    </h3>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        {selectedJob.metadata.fields.map((field: string, idx: number) => (
+                                                            <span key={idx} style={{
+                                                                padding: '0.5rem 1rem',
+                                                                borderRadius: '12px',
+                                                                background: 'rgba(59, 130, 246, 0.1)',
+                                                                color: '#3B82F6',
+                                                                fontSize: '0.9rem',
+                                                                fontWeight: 600
+                                                            }}>
+                                                                {field}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+
+                                            {/* Experience Required */}
+                                            {selectedJob.metadata.experience_required && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <BarChart3 size={24} style={{ color: '#8B5CF6' }} /> Kinh nghiệm yêu cầu
+                                                    </h3>
+                                                    <div style={{
+                                                        padding: '1rem 1.5rem',
+                                                        borderRadius: '12px',
+                                                        background: 'rgba(139, 92, 246, 0.1)',
+                                                        color: '#8B5CF6',
+                                                        fontSize: '1.1rem',
+                                                        fontWeight: 600,
+                                                        display: 'inline-block'
+                                                    }}>
+                                                        {selectedJob.metadata.experience_required}
+                                                    </div>
+                                                </section>
+                                            )}
+
+                                            {/* Working Regions */}
+                                            {selectedJob.metadata.working_regions && selectedJob.metadata.working_regions.length > 0 && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <MapPin size={24} style={{ color: '#10B981' }} /> Khu vực làm việc
+                                                    </h3>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        {selectedJob.metadata.working_regions.map((region: string, idx: number) => (
+                                                            <span key={idx} style={{
+                                                                padding: '0.5rem 1rem',
+                                                                borderRadius: '12px',
+                                                                background: 'rgba(16, 185, 129, 0.1)',
+                                                                color: '#10B981',
+                                                                fontSize: '0.9rem',
+                                                                fontWeight: 600
+                                                            }}>
+                                                                📌 {region}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+
+                                            {/* Benefits */}
+                                            {selectedJob.metadata.benefits && selectedJob.metadata.benefits.length > 0 && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <Gem size={24} style={{ color: '#3B82F6' }} /> Quyền lợi
+                                                    </h3>
+                                                    <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+                                                        {selectedJob.metadata.benefits.map((benefit: string, idx: number) => (
+                                                            <li key={idx} style={{
+                                                                lineHeight: 2,
+                                                                color: '#475569',
+                                                                fontSize: '1.05rem'
+                                                            }}>
+                                                                {benefit}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </section>
+                                            )}
+
+                                            {/* Requirements Tags */}
+                                            {selectedJob.metadata.requirements_tags && selectedJob.metadata.requirements_tags.length > 0 && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <Tags size={24} style={{ color: '#64748B' }} /> Tags
+                                                    </h3>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        {selectedJob.metadata.requirements_tags.map((tag: string, idx: number) => (
+                                                            <span key={idx} style={{
+                                                                padding: '0.5rem 1rem',
+                                                                borderRadius: '20px',
+                                                                background: '#F1F5F9',
+                                                                color: '#475569',
+                                                                fontSize: '0.85rem',
+                                                                fontWeight: 600,
+                                                                border: '1px solid #E2E8F0'
+                                                            }}>
+                                                                #{tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+
+                                            {/* Employment Types */}
+                                            {selectedJob.metadata.employment_types && selectedJob.metadata.employment_types.length > 0 && (
+                                                <section style={{ marginBottom: '2.5rem' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>💼 Loại hình công việc</h3>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        {selectedJob.metadata.employment_types.map((type: string, idx: number) => (
+                                                            <span key={idx} style={{
+                                                                padding: '0.5rem 1rem',
+                                                                borderRadius: '12px',
+                                                                background: 'rgba(251, 140, 0, 0.1)',
+                                                                color: '#FB8C00',
+                                                                fontSize: '0.9rem',
+                                                                fontWeight: 600
+                                                            }}>
+                                                                {type}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                                     <div style={{ padding: '1.5rem', borderRadius: '24px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
@@ -334,8 +498,8 @@ export default function AdminJobsPage() {
                                             <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1E293B' }}>{selectedJob.employer?.company_name || selectedJob.employer?.full_name}</div>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><FiMail style={{ color: '#3B82F6' }} /> {selectedJob.employer?.email}</div>
-                                            {selectedJob.employer?.phone && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><FiPhone style={{ color: '#10B981' }} /> {selectedJob.employer.phone}</div>}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><Mail size={16} style={{ color: '#3B82F6' }} /> {selectedJob.employer?.email}</div>
+                                            {selectedJob.employer?.phone && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><Phone size={16} style={{ color: '#10B981' }} /> {selectedJob.employer.phone}</div>}
                                         </div>
                                     </div>
 

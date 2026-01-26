@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useRef } from 'react';
 import { FiBell, FiMessageSquare, FiUser, FiSettings, FiLogOut, FiChevronDown, FiLayout, FiPlusCircle, FiList, FiPauseCircle, FiHome, FiFileText, FiClock, FiCheckSquare, FiStar, FiCalendar, FiBarChart2, FiZap, FiLink2, FiUsers, FiCheckCircle } from 'react-icons/fi';
@@ -10,6 +10,7 @@ interface NavbarProps {
 export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
     const { user, profile, signOut } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showJobsMenu, setShowJobsMenu] = useState(false);
     const [showCVMenu, setShowCVMenu] = useState(false);
@@ -85,6 +86,9 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
         empToolsTimeoutRef.current = window.setTimeout(() => setShowEmpToolsMenu(false), 300);
     };
 
+    // Helper function to check if a path is active
+    const isActive = (path: string) => location.pathname === path;
+
     if (!user) return null;
 
     return (
@@ -114,12 +118,12 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             alignItems: 'center',
                                             gap: '0.625rem',
                                             padding: '0.625rem 1rem',
-                                            fontWeight: 700,
+                                            fontWeight: isActive('/admin/dashboard') ? 700 : 600,
                                             fontSize: '0.9rem',
-                                            color: 'var(--color-primary)',
+                                            color: isActive('/admin/dashboard') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
                                             borderRadius: '12px',
-                                            background: 'rgba(30, 136, 229, 0.08)',
+                                            background: isActive('/admin/dashboard') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             transition: 'all 0.2s ease'
                                         }}
                                         onMouseEnter={(e) => {
@@ -127,7 +131,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             e.currentTarget.style.transform = 'translateY(-1px)';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.08)';
+                                            e.currentTarget.style.background = isActive('/admin/dashboard') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
                                             e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
@@ -141,15 +145,22 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             alignItems: 'center',
                                             gap: '0.625rem',
                                             padding: '0.625rem 1rem',
-                                            fontWeight: 600,
+                                            fontWeight: isActive('/admin/users') ? 700 : 600,
                                             fontSize: '0.9rem',
-                                            color: 'var(--color-text)',
+                                            color: isActive('/admin/users') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
                                             borderRadius: '12px',
+                                            background: isActive('/admin/users') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = isActive('/admin/users') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
                                     >
                                         <FiUsers size={18} />
                                         Người dùng
@@ -161,15 +172,22 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             alignItems: 'center',
                                             gap: '0.625rem',
                                             padding: '0.625rem 1rem',
-                                            fontWeight: 600,
+                                            fontWeight: isActive('/admin/jobs') ? 700 : 600,
                                             fontSize: '0.9rem',
-                                            color: 'var(--color-text)',
+                                            color: isActive('/admin/jobs') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
                                             borderRadius: '12px',
+                                            background: isActive('/admin/jobs') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = isActive('/admin/jobs') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
                                     >
                                         <FiCheckCircle size={18} />
                                         Duyệt tin
@@ -181,15 +199,22 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             alignItems: 'center',
                                             gap: '0.625rem',
                                             padding: '0.625rem 1rem',
-                                            fontWeight: 600,
+                                            fontWeight: isActive('/admin/news') ? 700 : 600,
                                             fontSize: '0.9rem',
-                                            color: 'var(--color-text)',
+                                            color: isActive('/admin/news') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
                                             borderRadius: '12px',
+                                            background: isActive('/admin/news') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = isActive('/admin/news') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
                                     >
                                         <FiFileText size={18} />
                                         Tin tức
@@ -201,18 +226,52 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             alignItems: 'center',
                                             gap: '0.625rem',
                                             padding: '0.625rem 1rem',
-                                            fontWeight: 600,
+                                            fontWeight: isActive('/admin/courses') ? 700 : 600,
                                             fontSize: '0.9rem',
-                                            color: 'var(--color-text)',
+                                            color: isActive('/admin/courses') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
                                             borderRadius: '12px',
+                                            background: isActive('/admin/courses') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = isActive('/admin/courses') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
                                     >
                                         <FiList size={18} />
                                         Khoá học
+                                    </Link>
+                                    <Link
+                                        to="/admin/analytics"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.625rem',
+                                            padding: '0.625rem 1rem',
+                                            fontWeight: isActive('/admin/analytics') ? 700 : 600,
+                                            fontSize: '0.9rem',
+                                            color: isActive('/admin/analytics') ? 'var(--color-primary)' : 'var(--color-text)',
+                                            textDecoration: 'none',
+                                            borderRadius: '12px',
+                                            background: isActive('/admin/analytics') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(30, 136, 229, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = isActive('/admin/analytics') ? 'rgba(30, 136, 229, 0.08)' : 'transparent';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
+                                    >
+                                        <FiBarChart2 size={18} />
+                                        Thống kê
                                     </Link>
                                 </div>
                             ) : profile?.role === 'employer' ? (
