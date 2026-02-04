@@ -48,7 +48,7 @@ export default function HomePage() {
 
             if (jobsData && jobsData.length > 0) {
                 // Get unique employer IDs
-                const employerIds = [...new Set(jobsData.map(job => job.employer_id))];
+                const employerIds = [...new Set(jobsData.map(job => (job as any).creator_id))];
 
                 // Fetch employer profiles
                 const { data: employersData, error: employersError } = await supabase
@@ -63,7 +63,7 @@ export default function HomePage() {
                 // Merge employer data with jobs
                 const jobsWithEmployers = jobsData.map(job => ({
                     ...job,
-                    employer: employersData?.find(emp => emp.id === job.employer_id)
+                    employer: employersData?.find(emp => emp.id === (job as any).creator_id)
                 }));
 
                 setJobs(jobsWithEmployers);
@@ -88,11 +88,18 @@ export default function HomePage() {
     };
 
     const formatSalary = (salary: any) => {
-        if (!salary) return 'Thỏa thuận';
-        if (salary.is_negotiable) return 'Thỏa thuận';
+        if (!salary || salary.is_negotiable) return 'Thỏa thuận';
+
+        const formatNumber = (num: number) => {
+            if (num >= 100000) return (num / 1000000).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+            return num.toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+        };
+
         if (salary.min && salary.max) {
-            return `${(salary.min / 1000000).toFixed(0)}-${(salary.max / 1000000).toFixed(0)} Triệu`;
+            return `${formatNumber(salary.min)} - ${formatNumber(salary.max)} triệu`;
         }
+        if (salary.min) return `Từ ${formatNumber(salary.min)} triệu`;
+        if (salary.max) return `Đến ${formatNumber(salary.max)} triệu`;
         return 'Thỏa thuận';
     };
 

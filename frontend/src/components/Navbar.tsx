@@ -1,13 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useRef } from 'react';
-import { FiBell, FiMessageSquare, FiUser, FiSettings, FiLogOut, FiChevronDown, FiLayout, FiPlusCircle, FiList, FiPauseCircle, FiHome, FiFileText, FiClock, FiCheckSquare, FiStar, FiCalendar, FiBarChart2, FiZap, FiLink2, FiUsers, FiCheckCircle } from 'react-icons/fi';
+import { FiBell, FiMessageSquare, FiUser, FiSettings, FiLogOut, FiChevronDown, FiLayout, FiPlusCircle, FiList, FiPauseCircle, FiHome, FiFileText, FiClock, FiCheckSquare, FiStar, FiCalendar, FiBarChart2, FiZap, FiLink2, FiUsers, FiCheckCircle, FiMenu, FiChevronsLeft } from 'react-icons/fi';
 
 interface NavbarProps {
     onToggleSidebar?: () => void;
+    isSidebarOpen?: boolean;
 }
 
-export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
+export default function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps = {}) {
     const { user, profile, signOut } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -97,6 +98,25 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                 <div className="navbar-container">
                     {/* Left: Logo + Menus */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xl)' }}>
+                        {onToggleSidebar && (
+                            <button
+                                onClick={onToggleSidebar}
+                                style={{
+                                    background: 'rgba(30, 136, 229, 0.08)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: 'var(--color-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '10px',
+                                    borderRadius: '12px',
+                                    transition: 'all 0.3s ease',
+                                    marginRight: '1rem'
+                                }}
+                            >
+                                {isSidebarOpen ? <FiChevronsLeft size={20} /> : <FiMenu size={20} />}
+                            </button>
+                        )}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0', position: 'relative' }}>
                             <Link to="/" className="navbar-brand" style={{ gap: '0.25rem', marginBottom: '-4px' }}>
                                 <span style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-2px', color: 'var(--color-primary)', display: 'block', lineHeight: 1 }}>NP</span>
@@ -403,66 +423,81 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                     <Link
                                         to="/school/dashboard"
                                         style={{
-                                            padding: '0.5rem 0.75rem',
-                                            fontWeight: 500,
-                                            fontSize: '0.9375rem',
-                                            color: 'var(--color-text)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.5rem 1rem',
+                                            fontWeight: isActive('/school/dashboard') ? 700 : 600,
+                                            fontSize: '0.9rem',
+                                            color: isActive('/school/dashboard') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
-                                            borderRadius: 'var(--radius-sm)',
-                                            transition: 'background var(--transition-fast)'
+                                            borderRadius: '12px',
+                                            background: isActive('/school/dashboard') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
+                                            transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        📊 Dashboard
+                                        <FiLayout size={18} />
+                                        Dashboard
                                     </Link>
+
                                     <Link
-                                        to="/school/jobs/create"
+                                        to="/school/partnerships"
                                         style={{
-                                            padding: '0.5rem 0.75rem',
-                                            fontWeight: 500,
-                                            fontSize: '0.9375rem',
-                                            color: 'var(--color-text)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.5rem 1rem',
+                                            fontWeight: isActive('/school/partnerships') ? 700 : 600,
+                                            fontSize: '0.9rem',
+                                            color: isActive('/school/partnerships') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
-                                            borderRadius: 'var(--radius-sm)',
-                                            transition: 'background var(--transition-fast)'
+                                            borderRadius: '12px',
+                                            background: isActive('/school/partnerships') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
+                                            transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        ➕ Đăng việc
+                                        <FiLink2 size={18} />
+                                        Đối tác
                                     </Link>
-                                    <Link
-                                        to="/school/jobs"
-                                        style={{
-                                            padding: '0.5rem 0.75rem',
-                                            fontWeight: 500,
-                                            fontSize: '0.9375rem',
-                                            color: 'var(--color-text)',
-                                            textDecoration: 'none',
-                                            borderRadius: 'var(--radius-sm)',
-                                            transition: 'background var(--transition-fast)'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                        📋 Quản lý
-                                    </Link>
+
                                     <Link
                                         to="/school/students"
                                         style={{
-                                            padding: '0.5rem 0.75rem',
-                                            fontWeight: 500,
-                                            fontSize: '0.9375rem',
-                                            color: 'var(--color-text)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.5rem 1rem',
+                                            fontWeight: isActive('/school/students') ? 700 : 600,
+                                            fontSize: '0.9rem',
+                                            color: isActive('/school/students') ? 'var(--color-primary)' : 'var(--color-text)',
                                             textDecoration: 'none',
-                                            borderRadius: 'var(--radius-sm)',
-                                            transition: 'background var(--transition-fast)'
+                                            borderRadius: '12px',
+                                            background: isActive('/school/students') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
+                                            transition: 'all 0.2s ease'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        🎓 Học sinh
+                                        <FiUsers size={18} />
+                                        Sinh viên
+                                    </Link>
+
+                                    <Link
+                                        to="/news"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            padding: '0.5rem 1rem',
+                                            fontWeight: isActive('/news') ? 700 : 600,
+                                            fontSize: '0.9rem',
+                                            color: isActive('/news') ? 'var(--color-primary)' : 'var(--color-text)',
+                                            textDecoration: 'none',
+                                            borderRadius: '12px',
+                                            background: isActive('/news') ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    >
+                                        <FiFileText size={18} />
+                                        Tin tuyển dụng
                                     </Link>
                                 </>
                             ) : (
@@ -500,7 +535,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                             <div className="dropdown-menu" style={{ paddingTop: '0.5rem' }}>
                                                 <Link to="/jobs" className="dropdown-item">Tìm việc làm</Link>
                                                 <Link to="/jobs?filter=latest" className="dropdown-item">Việc làm mới nhất</Link>
-                                                <Link to="/jobs?filter=hot" className="dropdown-item">Việc làm hot</Link>
+                                                <Link to="/jobs?filter=applied" className="dropdown-item">Việc làm đã ứng tuyển</Link>
                                                 <Link to="/candidate/saved-jobs" className="dropdown-item">Việc làm đã lưu</Link>
                                             </div>
                                         )}
@@ -581,7 +616,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                     </div>
 
                                     <Link
-                                        to="/career-guide"
+                                        to="/courses"
                                         style={{
                                             padding: '0.5rem 0.75rem',
                                             fontWeight: 500,
@@ -594,7 +629,24 @@ export default function Navbar({ onToggleSidebar }: NavbarProps = {}) {
                                         onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
                                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        Cẩm nang nghề nghiệp
+                                        Khoá học
+                                    </Link>
+
+                                    <Link
+                                        to="/news"
+                                        style={{
+                                            padding: '0.5rem 0.75rem',
+                                            fontWeight: 500,
+                                            fontSize: '0.9375rem',
+                                            color: 'var(--color-text)',
+                                            textDecoration: 'none',
+                                            borderRadius: 'var(--radius-sm)',
+                                            transition: 'background var(--transition-fast)'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-hover)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        Tin tức nghề nghiệp
                                     </Link>
                                 </>
                             )}

@@ -14,15 +14,63 @@ import { vi } from 'date-fns/locale';
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
-    const [job, setJob] = useState<Job | null>(null);
+    const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [applying, setApplying] = useState(false);
     const [saved, setSaved] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [applicationInfo, setApplicationInfo] = useState<any>(null);
 
     useEffect(() => {
         if (id) fetchJob();
-    }, [id]);
+        if (id && user) checkApplication();
+    }, [id, user]);
+
+    const checkApplication = async () => {
+        try {
+            // Check activities first
+            const { data: activities, error } = await supabase
+                .from('user_job_activities')
+                .select('*')
+                .eq('user_id', user?.id)
+                .eq('job_id', id);
+
+            if (error) throw error;
+
+            // Find application activity
+            const appAct = activities?.find(a =>
+                a.activity_type === 'applied' || a.activity === 'applied' || a.is_applied === true
+            );
+
+            if (appAct) {
+                // Fetch CV name
+                let cvTitle = 'CV Mặc định';
+                if (appAct.cv_id && appAct.cv_id !== '00000000-0000-0000-0000-000000000000') {
+                    const { data: cvData } = await supabase
+                        .from('cv_templates')
+                        .select('title')
+                        .eq('id', appAct.cv_id)
+                        .maybeSingle();
+                    if (cvData) cvTitle = cvData.title;
+                }
+
+                setApplicationInfo({
+                    ...appAct,
+                    cvTitle
+                });
+                setSuccess(true);
+            }
+
+            // Also check saved status
+            const savedAct = activities?.find(a =>
+                a.activity_type === 'saved' || a.activity === 'saved' || a.is_saved === true
+            );
+            if (savedAct) setSaved(true);
+
+        } catch (error) {
+            console.error('Error checking application:', error);
+        }
+    };
 
     const fetchJob = async () => {
         try {
@@ -41,7 +89,7 @@ export default function JobDetailPage() {
                 const { data: employerData, error: employerError } = await supabase
                     .from('profiles')
                     .select('id, full_name, company_name, avatar_url, email, phone, metadata')
-                    .eq('id', jobData.employer_id)
+                    .eq('id', jobData.creator_id)
                     .single();
 
                 if (employerError) {
@@ -106,13 +154,19 @@ export default function JobDetailPage() {
     };
 
     const formatSalary = (salary: any) => {
-        if (!salary) return 'Thỏa thuận';
+        if (!salary || salary.is_negotiable) return 'Thỏa thuận';
         if (typeof salary === 'string') return salary;
-        if (salary.is_negotiable) return 'Thỏa thuận';
+
+        const formatNumber = (num: number) => {
+            if (num >= 100000) return (num / 1000000).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+            return num.toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+        };
 
         if (salary.min && salary.max) {
-            return `${salary.min.toLocaleString()} - ${salary.max.toLocaleString()} ${salary.currency}/${salary.type === 'monthly' ? 'tháng' : 'năm'}`;
+            return `${formatNumber(salary.min)} - ${formatNumber(salary.max)} triệu`;
         }
+        if (salary.min) return `Từ ${formatNumber(salary.min)} triệu`;
+        if (salary.max) return `Đến ${formatNumber(salary.max)} triệu`;
         return 'Thỏa thuận';
     };
 
@@ -246,38 +300,85 @@ export default function JobDetailPage() {
 
                                     {/* Action Buttons */}
                                     <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-                                        <button
-                                            onClick={handleApply}
-                                            className="btn btn-primary btn-lg"
-                                            disabled={applying || success}
-                                            style={{ minWidth: '200px' }}
-                                        >
-                                            {success ? (
-                                                <>
-                                                    <FiCheckCircle size={20} />
-                                                    Đã ứng tuyển
-                                                </>
-                                            ) : applying ? 'Đang xử lý...' : (
-                                                <>
-                                                    Ứng tuyển ngay
-                                                </>
-                                            )}
-                                        </button>
+                                        {user?.id === job.creator_id ? (
+                                            <Link
+                                                to={job.profiles?.role === 'school' ? `/school/jobs/${job.id}/applicants` : `/employer/jobs/${job.id}/applicants`}
+                                                className="btn btn-primary btn-lg"
+                                                style={{ minWidth: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                            >
+                                                <FiUsers size={20} />
+                                                Quản lý ứng viên ({job.applicants?.length || 0})
+                                            </Link>
+                                        ) : !applicationInfo ? (
+                                            <>
+                                                <button
+                                                    onClick={handleApply}
+                                                    className="btn btn-primary btn-lg"
+                                                    disabled={applying || success}
+                                                    style={{ minWidth: '200px' }}
+                                                >
+                                                    {success ? (
+                                                        <>
+                                                            <FiCheckCircle size={20} />
+                                                            Đã ứng tuyển
+                                                        </>
+                                                    ) : applying ? 'Đang xử lý...' : (
+                                                        <>
+                                                            Ứng tuyển ngay
+                                                        </>
+                                                    )}
+                                                </button>
 
-                                        <button
-                                            onClick={handleSave}
-                                            className="btn btn-outline-primary"
-                                            style={{
-                                                background: saved ? 'rgba(30, 136, 229, 0.1)' : 'transparent'
-                                            }}
-                                        >
-                                            <FiBookmark size={18} fill={saved ? 'var(--color-primary)' : 'none'} />
-                                            Lưu tin
-                                        </button>
+                                                <button
+                                                    onClick={handleSave}
+                                                    className="btn btn-outline-primary"
+                                                    style={{
+                                                        background: saved ? 'rgba(30, 136, 229, 0.1)' : 'transparent'
+                                                    }}
+                                                >
+                                                    <FiBookmark size={18} fill={saved ? 'var(--color-primary)' : 'none'} />
+                                                    Lưu tin
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div style={{
+                                                padding: 'var(--spacing-md) var(--spacing-lg)',
+                                                background: 'var(--color-success-light)',
+                                                borderRadius: 'var(--radius-md)',
+                                                border: '1px solid var(--color-success)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 'var(--spacing-md)',
+                                                flex: 1
+                                            }}>
+                                                <div style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    borderRadius: '50%',
+                                                    background: 'var(--color-success)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: 'white'
+                                                }}>
+                                                    <FiCheckCircle size={24} />
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontWeight: 700, color: 'var(--color-success-dark)', fontSize: '1.1rem' }}>
+                                                        Bạn đã ứng tuyển công việc này
+                                                    </div>
+                                                    <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+                                                        <FiBriefcase size={14} />
+                                                        CV đã nộp: <strong style={{ color: 'var(--color-primary)' }}>{applicationInfo.cvTitle}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <button
                                             onClick={handleShare}
                                             className="btn btn-secondary"
+                                            style={{ height: (applicationInfo || user?.id === job.creator_id) ? 'auto' : 'unset' }}
                                         >
                                             <FiShare2 size={18} />
                                         </button>
@@ -285,21 +386,32 @@ export default function JobDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Deadline Warning */}
+                            {/* Deadline or Application Status Warning */}
                             <div style={{
                                 marginTop: 'var(--spacing-lg)',
                                 padding: 'var(--spacing-md)',
-                                background: 'rgba(255, 193, 7, 0.1)',
-                                borderLeft: '4px solid var(--color-warning)',
+                                background: applicationInfo ? 'rgba(30, 136, 229, 0.05)' : 'rgba(255, 193, 7, 0.1)',
+                                borderLeft: `4px solid ${applicationInfo ? 'var(--color-primary)' : 'var(--color-warning)'}`,
                                 borderRadius: 'var(--radius-sm)',
                                 display: 'flex',
                                 alignItems: 'center',
+                                justifyContent: 'space-between',
                                 gap: 'var(--spacing-sm)'
                             }}>
-                                <FiCalendar size={18} style={{ color: 'var(--color-warning)' }} />
-                                <span style={{ fontSize: '0.9375rem' }}>
-                                    Hạn nộp hồ sơ: {new Date(job.deadline).toLocaleDateString('vi-VN')}
-                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                                    {applicationInfo ? <FiClock size={18} style={{ color: 'var(--color-primary)' }} /> : <FiCalendar size={18} style={{ color: 'var(--color-warning)' }} />}
+                                    <span style={{ fontSize: '0.9375rem', fontWeight: applicationInfo ? 600 : 400 }}>
+                                        {applicationInfo
+                                            ? `Trạng thái: ${applicationInfo.status === 'accepted' ? 'Đã duyệt' : applicationInfo.status === 'rejected' ? 'Từ chối' : 'Đang chờ duyệt'}`
+                                            : `Hạn nộp hồ sơ: ${new Date(job.deadline).toLocaleDateString('vi-VN')}`
+                                        }
+                                    </span>
+                                </div>
+                                {applicationInfo && (
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                                        Ngày nộp: {new Date(applicationInfo.created_at).toLocaleDateString('vi-VN')}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -468,7 +580,7 @@ export default function JobDetailPage() {
                             </div>
 
                             <Link
-                                to={`/company/${job.employer_id}`}
+                                to={`/company/${job.creator_id}`}
                                 className="btn btn-outline-primary"
                                 style={{ width: '100%' }}
                             >

@@ -2,27 +2,23 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
-    FiFileText,
-    FiBriefcase,
-    FiSettings,
-    FiChevronDown,
-    FiUser,
-    FiMail,
-    FiShield,
-    FiBook
-} from 'react-icons/fi';
+    FileText, Briefcase, Settings, ChevronDown, User,
+    Shield, BookOpen, LayoutDashboard, Handshake,
+    Users, Search, Bookmark, Send, LogOut, ChevronLeft, ChevronRight, Plus
+} from 'lucide-react';
 
 interface SidebarProps {
     isOpen: boolean;
-    onClose?: () => void;
+    onToggle?: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-    const { user, profile } = useAuth();
+export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
+    const { profile, signOut } = useAuth();
     const location = useLocation();
-    const [openSections, setOpenSections] = useState<string[]>(['jobs', 'cv']);
+    const [openSections, setOpenSections] = useState<string[]>(['jobs', 'cv', 'recruitment', 'partnerships', 'management', 'school_mgmt', 'news_mgmt']);
 
     const toggleSection = (section: string) => {
+        if (!isOpen) return;
         setOpenSections(prev =>
             prev.includes(section)
                 ? prev.filter(s => s !== section)
@@ -32,241 +28,300 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const isActive = (path: string) => location.pathname === path;
 
-    // Menu structure based on role
-    const getMenuItems = () => {
+    const menuItems = (() => {
         const role = profile?.role;
-
-        // Candidate Menu
         if (role === 'candidate') {
             return [
                 {
                     id: 'jobs',
-                    title: 'Quản lý tìm việc',
-                    icon: <FiBriefcase />,
+                    title: 'Tìm việc làm',
+                    icon: <Search size={22} />,
                     items: [
-                        { label: 'Việc làm đã lưu', path: '/candidate/saved-jobs' },
-                        { label: 'Việc làm đã ứng tuyển', path: '/candidate/applied-jobs' },
-                        { label: 'Việc làm phù hợp với bạn', path: '/jobs' },
-                        { label: 'Cài đặt gợi ý việc làm', path: '/candidate/job-alerts' },
+                        { label: 'Việc làm phù hợp', path: '/jobs', icon: <Briefcase size={16} /> },
+                        { label: 'Việc làm đã lưu', path: '/candidate/saved-jobs', icon: <Bookmark size={16} /> },
+                        { label: 'Việc làm đã ứng tuyển', path: '/candidate/applied-jobs', icon: <Send size={16} /> },
                     ]
                 },
                 {
                     id: 'cv',
-                    title: 'Quản lý CV & Cover letter',
-                    icon: <FiFileText />,
+                    title: 'Hồ sơ & CV',
+                    icon: <FileText size={22} />,
                     items: [
-                        { label: 'CV của tôi', path: '/candidate/cv' },
-                        { label: 'Cover Letter của tôi', path: '/candidate/cover-letters' },
-                        { label: 'Nhà tuyển dụng muốn kết nối với bạn', path: '/candidate/connections' },
-                        { label: 'Nhà tuyển dụng xem hồ sơ', path: '/candidate/profile-views' },
+                        { label: 'Mẫu CV chuyên nghiệp', path: '/candidate/cv', icon: <FileText size={16} /> },
+                        { label: 'Cập nhật hồ sơ', path: '/profile', icon: <User size={16} /> },
                     ]
-                },
-                {
-                    id: 'settings',
-                    title: 'Cài đặt email & thông báo',
-                    icon: <FiMail />,
-                    items: [
-                        { label: 'Cài đặt nhận email', path: '/settings/email' },
-                        { label: 'Cài đặt thông báo', path: '/settings/notifications' },
-                    ]
-                },
-                {
-                    id: 'account',
-                    title: 'Cá nhân & Bảo mật',
-                    icon: <FiUser />,
-                    items: [
-                        { label: 'Thông tin cá nhân', path: '/profile' },
-                        { label: 'Đổi mật khẩu', path: '/settings/password' },
-                    ]
-                },
+                }
             ];
         }
 
-        // Employer Menu
         if (role === 'employer') {
             return [
                 {
                     id: 'recruitment',
-                    title: 'Quản lý tuyển dụng',
-                    icon: <FiBriefcase />,
+                    title: 'Tuyển dụng',
+                    icon: <Briefcase size={22} />,
                     items: [
-                        { label: 'Đăng tin tuyển dụng', path: '/employer/jobs/create' },
-                        { label: 'Tin đã đăng', path: '/employer/jobs' },
-                        { label: 'Việc làm liên kết', path: '/employer/partnerships' },
-                        { label: 'Đối tác trường học', path: '/employer/schools' },
-                        { label: 'Ứng viên đã ứng tuyển', path: '/employer/applicants' },
-                        { label: 'Ứng viên đã lưu', path: '/employer/candidates/saved' },
+                        { label: 'Tổng quan', path: '/employer/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Đăng tin mới', path: '/employer/jobs/create', icon: <Send size={16} /> },
+                        { label: 'Tin tuyển dụng', path: '/employer/jobs', icon: <FileText size={16} /> },
+                        { label: 'Ứng viên', path: '/employer/candidates', icon: <Users size={16} /> },
                     ]
                 },
                 {
-                    id: 'company',
-                    title: 'Quản lý công ty',
-                    icon: <FiBriefcase />,
+                    id: 'partnerships',
+                    title: 'Đào tạo',
+                    icon: <Handshake size={22} />,
                     items: [
-                        { label: 'Thông tin công ty', path: '/employer/company' },
-                        { label: 'Dashboard', path: '/employer/dashboard' },
+                        { label: 'Đối tác trường', path: '/employer/schools', icon: <BookOpen size={16} /> },
+                        { label: 'Đánh giá thực tập', path: '/school/evaluations', icon: <CheckCircle2 size={16} /> },
                     ]
-                },
-                {
-                    id: 'settings',
-                    title: 'Cài đặt',
-                    icon: <FiSettings />,
-                    items: [
-                        { label: 'Thông tin tài khoản', path: '/profile' },
-                        { label: 'Bảo mật', path: '/settings/security' },
-                    ]
-                },
+                }
             ];
         }
 
-        // School Menu
         if (role === 'school') {
             return [
                 {
-                    id: 'partnerships',
-                    title: 'Quản lý hợp tác',
-                    icon: <FiBook />,
+                    id: 'school_mgmt',
+                    title: 'Đào tạo',
+                    icon: <BookOpen size={22} />,
                     items: [
-                        { label: 'Danh sách đối tác', path: '/school/partnerships' },
-                        { label: 'Việc làm từ trường', path: '/school/jobs' },
+                        { label: 'Dashboard', path: '/school/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Hợp tác DN', path: '/school/partnerships', icon: <Handshake size={16} /> },
+                        { label: 'Sinh viên', path: '/school/students', icon: <Users size={16} /> },
                     ]
                 },
                 {
-                    id: 'settings',
-                    title: 'Cài đặt',
-                    icon: <FiSettings />,
+                    id: 'news_mgmt',
+                    title: 'Quản lý tin tức',
+                    icon: <FileText size={22} />,
                     items: [
-                        { label: 'Thông tin trường', path: '/school/info' },
-                        { label: 'Dashboard', path: '/school/dashboard' },
+                        { label: 'Tạo tin mới', path: '/school/jobs/create', icon: <Plus size={16} /> },
+                        { label: 'Tin đã tạo', path: '/school/jobs', icon: <FileText size={16} /> },
+                        { label: 'Tin đã liên kết', path: '/school/partnership-jobs', icon: <Handshake size={16} /> },
                     ]
-                },
+                }
             ];
         }
 
-        // Admin Menu
         if (role === 'admin') {
             return [
                 {
                     id: 'management',
-                    title: 'Quản trị hệ thống',
-                    icon: <FiShield />,
+                    title: 'Admin',
+                    icon: <Shield size={22} />,
                     items: [
-                        { label: 'Dashboard', path: '/admin/dashboard' },
-                        { label: 'Quản lý người dùng', path: '/admin/users' },
-                        { label: 'Duyệt tin tuyển dụng', path: '/admin/jobs-approval' },
-                        { label: 'Thống kê', path: '/admin/analytics' },
+                        { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Duyệt tin', path: '/admin/jobs', icon: <Briefcase size={16} /> },
+                        { label: 'Người dùng', path: '/admin/users', icon: <Users size={16} /> },
                     ]
-                },
+                }
             ];
         }
-
-        // Default menu
         return [];
-    };
+    })();
 
-    const menuItems = getMenuItems();
+    const sidebarWidth = isOpen ? '280px' : '88px';
 
     return (
-        <>
-            {/* Backdrop for mobile */}
-            {isOpen && (
-                <div
-                    onClick={onClose}
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 1029,
-                        display: 'none'
-                    }}
-                    id="sidebar-backdrop"
-                />
-            )}
-
-            {/* Sidebar */}
-            <aside
-                className={`sidebar ${isOpen ? '' : 'sidebar-hidden'}`}
+        <aside
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: sidebarWidth,
+                height: '100vh',
+                background: 'white',
+                borderRight: '1px solid #E2E8F0',
+                zIndex: 1030,
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                paddingTop: 'var(--header-height)',
+                boxShadow: '10px 0 30px rgba(0,0,0,0.02)',
+                overflow: 'visible'
+            }}
+        >
+            {/* Premium Handle Toggle */}
+            <div
+                onClick={onToggle}
                 style={{
-                    paddingTop: 'var(--header-height)'
+                    position: 'absolute',
+                    top: '50%',
+                    right: '-14px',
+                    transform: 'translateY(-50%)',
+                    width: '28px',
+                    height: '56px',
+                    background: 'white',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '4px 0 10px rgba(0,0,0,0.04)',
+                    zIndex: 1032,
+                    color: '#94A3B8',
+                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--color-primary)';
+                    e.currentTarget.style.right = '-16px';
+                    e.currentTarget.style.boxShadow = '6px 0 15px rgba(30, 136, 229, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#94A3B8';
+                    e.currentTarget.style.right = '-14px';
+                    e.currentTarget.style.boxShadow = '4px 0 10px rgba(0,0,0,0.04)';
                 }}
             >
-                {/* User Info */}
-                <div className="sidebar-header">
-                    <div className="sidebar-user">
-                        <div className="sidebar-user-avatar">
-                            {profile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-                        </div>
-                        <div className="sidebar-user-info">
-                            <h4>{profile?.full_name || 'Người dùng'}</h4>
-                            <p>ID {user?.id.slice(0, 7) || '---'}</p>
-                            <p style={{ fontSize: '0.8125rem' }}>{user?.email}</p>
-                        </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }}></div>
+                    {isOpen ? <ChevronLeft size={16} strokeWidth={3} /> : <ChevronRight size={16} strokeWidth={3} />}
+                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }}></div>
+                </div>
+            </div>
+
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: isOpen ? '1rem' : '0.75rem' }}>
+                <div style={{
+                    padding: isOpen ? '1.25rem' : '0.5rem',
+                    background: '#F8FAFC',
+                    borderRadius: '24px',
+                    marginBottom: '1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: isOpen ? 'flex-start' : 'center',
+                    gap: isOpen ? '1rem' : '0',
+                    transition: 'all 0.3s ease',
+                    border: '1px solid #F1F5F9'
+                }}>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '16px',
+                        background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 900,
+                        fontSize: '1.2rem',
+                        flexShrink: 0,
+                        boxShadow: '0 8px 16px rgba(30, 136, 229, 0.2)'
+                    }}>
+                        {profile?.full_name?.[0]?.toUpperCase() || 'U'}
                     </div>
+                    {isOpen && (
+                        <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '1rem' }}>{profile?.full_name || 'Hệ thống'}</div>
+                            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748B' }}>
+                                • {profile?.role?.toUpperCase()}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Menu Sections */}
-                <ul className="sidebar-menu">
+                <nav>
                     {menuItems.map((section) => (
-                        <li key={section.id} className="sidebar-menu-section">
+                        <div key={section.id} style={{ marginBottom: '0.5rem' }}>
                             <div
-                                className="sidebar-menu-title"
                                 onClick={() => toggleSection(section.id)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: isOpen ? 'flex-start' : 'center',
+                                    gap: '12px',
+                                    padding: '12px',
+                                    borderRadius: '16px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    background: isOpen && openSections.includes(section.id) ? '#F1F5F9' : 'transparent',
+                                    color: (isOpen && openSections.includes(section.id)) ? '#0F172A' : '#64748B'
+                                }}
                             >
-                                <div className="sidebar-menu-title-icon">
-                                    {section.icon}
-                                </div>
-                                <span className="sidebar-menu-title-text">{section.title}</span>
-                                <FiChevronDown
-                                    className={`sidebar-menu-title-chevron ${openSections.includes(section.id) ? 'open' : ''
-                                        }`}
-                                    size={16}
-                                />
+                                <span style={{ opacity: openSections.includes(section.id) ? 1 : 0.7, flexShrink: 0 }}>{section.icon}</span>
+                                {isOpen && (
+                                    <>
+                                        <span style={{ flex: 1, fontWeight: 700, fontSize: '0.95rem', whiteSpace: 'nowrap' }}>{section.title}</span>
+                                        <ChevronDown size={14} style={{ transform: openSections.includes(section.id) ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s', opacity: 0.4 }} />
+                                    </>
+                                )}
                             </div>
 
-                            <ul className={`sidebar-submenu ${openSections.includes(section.id) ? 'open' : ''}`}>
-                                {section.items.map((item, index) => (
-                                    <li key={index}>
+                            {(isOpen && openSections.includes(section.id)) && (
+                                <div style={{
+                                    paddingLeft: '1rem',
+                                    marginTop: '4px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '2px'
+                                }}>
+                                    {section.items.map((item, idx) => (
                                         <Link
+                                            key={idx}
                                             to={item.path}
-                                            className="sidebar-submenu-item"
                                             style={{
-                                                background: isActive(item.path) ? 'var(--color-hover)' : 'transparent',
-                                                color: isActive(item.path) ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                                                fontWeight: isActive(item.path) ? 600 : 400,
+                                                display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px',
+                                                borderRadius: '12px', textDecoration: 'none', fontSize: '0.9rem',
+                                                fontWeight: isActive(item.path) ? 700 : 500,
+                                                color: isActive(item.path) ? 'var(--color-primary)' : '#475569',
+                                                background: isActive(item.path) ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                                             }}
-                                            onClick={onClose}
                                         >
+                                            <span style={{ opacity: isActive(item.path) ? 1 : 0.5 }}>{item.icon}</span>
                                             {item.label}
                                         </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     ))}
-                </ul>
+                </nav>
+            </div>
 
-                {/* Footer */}
-                <div className="sidebar-footer">
-                    <Link
-                        to="/login"
-                        className="btn btn-outline-primary btn-block"
-                        style={{ fontSize: '0.9375rem' }}
-                    >
-                        Đăng tuyển & tìm hồ sơ
-                    </Link>
-                </div>
-            </aside>
-
-            <style>{`
-        @media (max-width: 1024px) {
-          #sidebar-backdrop {
-            display: block !important;
-          }
-        }
-      `}</style>
-        </>
+            <div style={{ padding: isOpen ? '1.25rem' : '0.75rem', borderTop: '1px solid #F1F5F9' }}>
+                <Link to="/profile" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: isOpen ? 'flex-start' : 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    color: '#64748B',
+                    fontWeight: 600,
+                    fontSize: '0.9rem'
+                }}>
+                    <Settings size={20} style={{ flexShrink: 0 }} />
+                    {isOpen && <span>Cấu hình</span>}
+                </Link>
+                <button
+                    onClick={() => signOut()}
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: isOpen ? 'flex-start' : 'center',
+                        gap: '12px',
+                        padding: '12px',
+                        borderRadius: '12px',
+                        background: isOpen ? '#FEF2F2' : 'transparent',
+                        border: 'none',
+                        color: '#DC2626',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        marginTop: '4px'
+                    }}
+                >
+                    <LogOut size={20} style={{ flexShrink: 0 }} />
+                    {isOpen && <span>Đăng xuất</span>}
+                </button>
+            </div>
+        </aside>
     );
 }
+
+const CheckCircle2 = ({ size }: { size: number }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><path d="m9 12 2 2 4-4" /></svg>
+);

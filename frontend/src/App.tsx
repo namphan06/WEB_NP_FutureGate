@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Suspense, lazy, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -14,6 +14,12 @@ const JobsPage = lazy(() => import('./pages/JobsPage'));
 const JobDetailPage = lazy(() => import('./pages/JobDetailPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+
+// New Candidate Utility Pages
+const CoursesPage = lazy(() => import('./pages/CoursesPage'));
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'));
+const CareerNewsPage = lazy(() => import('./pages/CareerNewsPage'));
+const CareerNewsDetailPage = lazy(() => import('./pages/CareerNewsDetailPage'));
 
 // Candidate Pages
 const CVManagementPage = lazy(() => import('./pages/candidate/CVManagementPage'));
@@ -34,6 +40,15 @@ const PartnershipJobsPage = lazy(() => import('./pages/employer/PartnershipJobsP
 const EmployerSchoolsPage = lazy(() => import('./pages/employer/EmployerSchoolsPage'));
 const InternEvaluationPage = lazy(() => import('./pages/employer/InternEvaluationPage'));
 
+// School Pages
+const SchoolDashboardPage = lazy(() => import('./pages/school/SchoolDashboardPage'));
+const SchoolPartnershipsPage = lazy(() => import('./pages/school/SchoolPartnershipsPage'));
+const SchoolStudentsPage = lazy(() => import('./pages/school/SchoolStudentsPage'));
+const SchoolCreateJobPage = lazy(() => import('./pages/school/SchoolCreateJobPage'));
+const SchoolManageJobsPage = lazy(() => import('./pages/school/SchoolManageJobsPage'));
+const SchoolPartnershipJobsPage = lazy(() => import('./pages/school/SchoolPartnershipJobsPage'));
+const SchoolJobApplicantsPage = lazy(() => import('./pages/school/SchoolJobApplicantsPage'));
+
 // Admin Pages
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
 const AdminJobsPage = lazy(() => import('./pages/admin/AdminJobsPage'));
@@ -42,9 +57,11 @@ const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 
+const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage'));
+
 // Layout
 import Navbar from './components/Navbar';
-// import Sidebar from './components/Sidebar';
+import Sidebar from './components/Sidebar';
 
 // Loading component
 function Loading() {
@@ -92,21 +109,32 @@ function RoleBasedRedirect() {
 
 function AppRoutes() {
   const { user } = useAuth();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // TEMPORARILY HIDE SIDEBAR ON ALL PAGES
-  const showSidebar = false;
+  // Show sidebar only for Dashboard-like pages or when specifically needed
+  const isDashboardRoute =
+    location.pathname.startsWith('/employer/') ||
+    location.pathname.startsWith('/admin/') ||
+    location.pathname.startsWith('/school/') ||
+    location.pathname.startsWith('/candidate/');
+
+  const showSidebar = !!user && isDashboardRoute;
 
   return (
     <>
-      {user && <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />}
-      {/* {showSidebar && <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />} */}
+      {user && <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />}
+      {showSidebar && <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />}
 
       <div
         className={showSidebar ? 'main-content' : ''}
         style={showSidebar ? {
-          marginLeft: sidebarOpen ? 'var(--sidebar-width)' : 0,
-          transition: 'margin-left var(--transition-base)'
+          marginLeft: sidebarOpen ? '280px' : '88px',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          paddingTop: 'var(--header-height)',
+          minHeight: '100vh',
+          background: '#F8FAFC',
+          width: sidebarOpen ? 'calc(100% - 280px)' : 'calc(100% - 88px)'
         } : {}}
       >
         <Suspense fallback={<Loading />}>
@@ -144,10 +172,56 @@ function AppRoutes() {
             />
 
             <Route
+              path="/company/:id"
+              element={
+                <PrivateRoute>
+                  <CompanyDetailPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
               path="/profile"
               element={
                 <PrivateRoute>
                   <ProfilePage />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Courses & News Routes */}
+            <Route
+              path="/courses"
+              element={
+                <PrivateRoute>
+                  <CoursesPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/courses/:id"
+              element={
+                <PrivateRoute>
+                  <CourseDetailPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/news"
+              element={
+                <PrivateRoute>
+                  <CareerNewsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/news/:id"
+              element={
+                <PrivateRoute>
+                  <CareerNewsDetailPage />
                 </PrivateRoute>
               }
             />
@@ -312,6 +386,64 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <InternEvaluationPage />
+                </PrivateRoute>
+              }
+            />
+
+            {/* School Routes */}
+            <Route
+              path="/school/dashboard"
+              element={
+                <PrivateRoute>
+                  <SchoolDashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/partnerships"
+              element={
+                <PrivateRoute>
+                  <SchoolPartnershipsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/students"
+              element={
+                <PrivateRoute>
+                  <SchoolStudentsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/jobs/create"
+              element={
+                <PrivateRoute>
+                  <SchoolCreateJobPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/jobs"
+              element={
+                <PrivateRoute>
+                  <SchoolManageJobsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/partnership-jobs"
+              element={
+                <PrivateRoute>
+                  <SchoolPartnershipJobsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/school/jobs/:jobId/applicants"
+              element={
+                <PrivateRoute>
+                  <SchoolJobApplicantsPage />
                 </PrivateRoute>
               }
             />

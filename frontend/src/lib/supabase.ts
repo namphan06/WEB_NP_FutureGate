@@ -14,6 +14,7 @@ export interface Profile {
     id: string;
     email: string | null;
     full_name: string | null;
+    company_name?: string | null;
     avatar_url: string | null;
     phone: string | null;
     role: 'candidate' | 'employer' | 'school' | 'admin';
@@ -26,6 +27,8 @@ export interface JobMetadata {
     title: string;
     working_regions: string[];
     experience_required: string;
+    experience_level?: string;
+    number_of_positions?: number;
     fields: string[];
     requirements_tags: string[];
     salary: {
@@ -38,7 +41,9 @@ export interface JobMetadata {
     employment_types: string[];
     work_locations: string[];
     job_description: string[];
+    description?: string;
     candidate_requirements: string[];
+    requirements?: string;
     benefits: string[];
 }
 
