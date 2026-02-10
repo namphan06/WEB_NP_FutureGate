@@ -56,6 +56,7 @@ const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
 const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
+const AdminMIQuestionsPage = lazy(() => import('./pages/admin/AdminMIQuestionsPage'));
 
 const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage'));
 
@@ -499,6 +500,15 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <AdminAnalyticsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/admin/mi-questions"
+              element={
+                <PrivateRoute>
+                  <AdminMIQuestionsPage />
                 </PrivateRoute>
               }
             />

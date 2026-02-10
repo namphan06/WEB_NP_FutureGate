@@ -15,7 +15,7 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
     const { profile, signOut } = useAuth();
     const location = useLocation();
-    const [openSections, setOpenSections] = useState<string[]>(['jobs', 'cv', 'recruitment', 'partnerships', 'management', 'school_mgmt', 'news_mgmt']);
+    const [openSections, setOpenSections] = useState<string[]>(['jobs', 'cv', 'recruitment', 'partnerships', 'management', 'school_mgmt', 'news_mgmt', 'recruitment_mgmt', 'utilities']);
 
     const toggleSection = (section: string) => {
         if (!isOpen) return;
@@ -108,12 +108,30 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             return [
                 {
                     id: 'management',
-                    title: 'Admin',
+                    title: 'Hệ thống',
                     icon: <Shield size={22} />,
                     items: [
                         { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={16} /> },
-                        { label: 'Duyệt tin', path: '/admin/jobs', icon: <Briefcase size={16} /> },
                         { label: 'Người dùng', path: '/admin/users', icon: <Users size={16} /> },
+                        { label: 'Phân tích', path: '/admin/analytics', icon: <Search size={16} /> },
+                    ]
+                },
+                {
+                    id: 'recruitment_mgmt',
+                    title: 'Tuyển dụng',
+                    icon: <Briefcase size={22} />,
+                    items: [
+                        { label: 'Duyệt tin', path: '/admin/jobs', icon: <Briefcase size={16} /> },
+                    ]
+                },
+                {
+                    id: 'utilities',
+                    title: 'Tiện ích',
+                    icon: <Plus size={22} />,
+                    items: [
+                        { label: 'Khoá học', path: '/admin/courses', icon: <BookOpen size={16} /> },
+                        { label: 'Tin tức', path: '/admin/news', icon: <FileText size={16} /> },
+                        { label: 'Trắc nghiệm MI', path: '/admin/mi-questions', icon: <LayoutDashboard size={16} /> },
                     ]
                 }
             ];

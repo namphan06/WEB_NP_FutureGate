@@ -162,3 +162,28 @@ export const COURSE_STATUS_LABELS: Record<CourseStatus, string> = {
     published: 'Đã xuất bản',
     archived: 'Đã lưu trữ'
 };
+
+// MI Question types
+export type MIIntelligenceType = 'IA' | 'IE' | 'LO' | 'LI' | 'SP' | 'BO' | 'MU' | 'NA' | 'EX';
+
+export interface MIQuestion {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    question_text: string;
+    intelligence_type: MIIntelligenceType;
+    order: number;
+    is_active: boolean;
+}
+
+export const MI_INTELLIGENCE_LABELS: Record<MIIntelligenceType, string> = {
+    IA: 'Nội tâm (Intrapersonal)',
+    IE: 'Giao tiếp (Interpersonal)',
+    LO: 'Logic - Toán học (Logical-Mathematical)',
+    LI: 'Ngôn ngữ (Linguistic)',
+    SP: 'Không gian (Spatial)',
+    BO: 'Vận động cơ thể (Bodily-Kinesthetic)',
+    MU: 'Âm nhạc (Musical)',
+    NA: 'Tự nhiên (Naturalistic)',
+    EX: 'Triết học - Hiện sinh (Existential)'
+};
