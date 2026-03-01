@@ -23,6 +23,7 @@ const CareerNewsDetailPage = lazy(() => import('./pages/CareerNewsDetailPage'));
 
 // Candidate Pages
 const CVManagementPage = lazy(() => import('./pages/candidate/CVManagementPage'));
+const CVEditorPage = lazy(() => import('./pages/candidate/CVEditorPage'));
 const SavedJobsPage = lazy(() => import('./pages/candidate/SavedJobsPage'));
 const AppliedJobsPage = lazy(() => import('./pages/candidate/AppliedJobsPage'));
 
@@ -227,12 +228,20 @@ function AppRoutes() {
               }
             />
 
-            {/* Candidate Routes */}
             <Route
               path="/candidate/cv"
               element={
                 <PrivateRoute>
                   <CVManagementPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/candidate/cv/:id/edit"
+              element={
+                <PrivateRoute>
+                  <CVEditorPage />
                 </PrivateRoute>
               }
             />
