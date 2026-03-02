@@ -187,3 +187,42 @@ export const MI_INTELLIGENCE_LABELS: Record<MIIntelligenceType, string> = {
     NA: 'Tự nhiên (Naturalistic)',
     EX: 'Triết học - Hiện sinh (Existential)'
 };
+
+// Chat types
+export interface Conversation {
+    id: string;
+    participant1_id: string;
+    participant1_type: string;
+    participant2_id: string;
+    participant2_type: string;
+    job_id: string | null;
+    application_id?: string | null;
+    last_message: string | null;
+    last_message_at: string | null;
+    last_message_sender_id: string | null;
+    status: 'active' | 'archived' | 'closed';
+    created_at: string;
+    updated_at: string;
+    // Joined data
+    otherUserName?: string;
+    otherUserAvatar?: string | null;
+    unreadCount?: number;
+}
+
+export interface Message {
+    id: string;
+    conversation_id: string;
+    sender_id: string;
+    sender_type: string;
+    content: string;
+    message_type: 'text' | 'image' | 'file' | 'system' | 'audio';
+    attachment_url: string | null;
+    attachment_name: string | null;
+    attachment_size: number | null;
+    is_read: boolean;
+    is_deleted: boolean;
+    created_at: string;
+    // Helper
+    isSentByMe?: boolean;
+}
+

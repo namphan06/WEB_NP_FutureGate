@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { FiMail, FiPhone, FiTrash2, FiUser } from 'react-icons/fi';
+import { FiMail, FiPhone, FiTrash2, FiUser, FiMessageSquare } from 'react-icons/fi';
+import { ChatService } from '../../lib/chatService';
+
 
 interface Candidate {
     id: string;
@@ -89,7 +91,17 @@ export default function SavedCandidatesPage() {
         }
     };
 
+    const handleChat = async (candidateId: string) => {
+        const conv = await ChatService.getOrCreateConversation(candidateId, 'candidate');
+        if (conv) {
+            navigate(`/chat/${conv.id}`);
+        } else {
+            alert('Không thể kết nối chat lúc này');
+        }
+    };
+
     if (loading) {
+
         return (
             <div className="container section">
                 <div className="loading text-center">Đang tải ứng viên đã lưu...</div>
@@ -164,6 +176,14 @@ export default function SavedCandidatesPage() {
 
                                 <div className="flex gap-md">
                                     <button
+                                        className="btn btn-outline-primary"
+                                        onClick={() => handleChat(candidate.id)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    >
+                                        <FiMessageSquare size={18} />
+                                        Nhắn tin
+                                    </button>
+                                    <button
                                         className="btn btn-outline"
                                         onClick={() => navigate(`/employer/cv/${candidate.metadata?.cv_ids?.[0] || 'new'}?applicant=${candidate.id}`)}
                                     >
@@ -178,6 +198,7 @@ export default function SavedCandidatesPage() {
                                         <FiTrash2 size={18} />
                                     </button>
                                 </div>
+
                             </div>
                         </div>
                     ))}

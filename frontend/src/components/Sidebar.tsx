@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
-    FileText, Briefcase, Settings, ChevronDown, User,
-    Shield, BookOpen, LayoutDashboard, Handshake,
+    MessageCircle, PieChart, FileText, Briefcase, Settings, ChevronDown, User,
+    Shield, BookOpen, LayoutDashboard, Handshake, Calendar, CheckCircle,
     Users, Search, Bookmark, Send, LogOut, ChevronLeft, ChevronRight, Plus
 } from 'lucide-react';
+
+
+
 
 interface SidebarProps {
     isOpen: boolean;
@@ -30,7 +33,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
     const menuItems = (() => {
         const role = profile?.role;
+
         if (role === 'candidate') {
+
             return [
                 {
                     id: 'jobs',
@@ -50,6 +55,20 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                         { label: 'Mẫu CV chuyên nghiệp', path: '/candidate/cv', icon: <FileText size={16} /> },
                         { label: 'Cập nhật hồ sơ', path: '/profile', icon: <User size={16} /> },
                     ]
+                },
+                {
+                    id: 'utilities',
+                    title: 'Tiện ích',
+                    icon: <Plus size={22} />,
+                    items: [
+                        { label: 'Tin nhắn', path: '/chat', icon: <MessageCircle size={16} /> },
+                        { label: 'Trắc nghiệm MI', path: '/candidate/mi-test', icon: <PieChart size={16} /> },
+                        { label: 'Lịch phỏng vấn', path: '/candidate/interviews', icon: <Calendar size={16} /> },
+                        { label: 'Khoá học', path: '/courses', icon: <BookOpen size={16} /> },
+
+
+                        { label: 'Tin tức', path: '/news', icon: <FileText size={16} /> },
+                    ]
                 }
             ];
         }
@@ -62,8 +81,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     icon: <Briefcase size={22} />,
                     items: [
                         { label: 'Tổng quan', path: '/employer/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Tin nhắn', path: '/chat', icon: <MessageCircle size={16} /> },
                         { label: 'Đăng tin mới', path: '/employer/jobs/create', icon: <Send size={16} /> },
                         { label: 'Tin tuyển dụng', path: '/employer/jobs', icon: <FileText size={16} /> },
+                        { label: 'Quyết định tuyển dụng', path: '/employer/recruitment-decisions', icon: <CheckCircle size={16} /> },
                         { label: 'Ứng viên', path: '/employer/candidates', icon: <Users size={16} /> },
                     ]
                 },
@@ -73,7 +94,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     icon: <Handshake size={22} />,
                     items: [
                         { label: 'Đối tác trường', path: '/employer/schools', icon: <BookOpen size={16} /> },
-                        { label: 'Đánh giá thực tập', path: '/school/evaluations', icon: <CheckCircle2 size={16} /> },
+                        { label: 'Đánh giá thực tập', path: '/employer/evaluations', icon: <CheckCircle2 size={16} /> },
                     ]
                 }
             ];
@@ -87,6 +108,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     icon: <BookOpen size={22} />,
                     items: [
                         { label: 'Dashboard', path: '/school/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Tin nhắn', path: '/chat', icon: <MessageCircle size={16} /> },
                         { label: 'Hợp tác DN', path: '/school/partnerships', icon: <Handshake size={16} /> },
                         { label: 'Sinh viên', path: '/school/students', icon: <Users size={16} /> },
                     ]
@@ -112,6 +134,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     icon: <Shield size={22} />,
                     items: [
                         { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={16} /> },
+                        { label: 'Tin nhắn', path: '/chat', icon: <MessageCircle size={16} /> },
                         { label: 'Người dùng', path: '/admin/users', icon: <Users size={16} /> },
                         { label: 'Phân tích', path: '/admin/analytics', icon: <Search size={16} /> },
                     ]
@@ -138,6 +161,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         }
         return [];
     })();
+
 
     const sidebarWidth = isOpen ? '280px' : '88px';
 
@@ -298,7 +322,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </div>
 
             <div style={{ padding: isOpen ? '1.25rem' : '0.75rem', borderTop: '1px solid #F1F5F9' }}>
-                <Link to="/profile" style={{
+                <Link to="/settings" style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: isOpen ? 'flex-start' : 'center',
@@ -306,11 +330,12 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     padding: '12px',
                     borderRadius: '12px',
                     textDecoration: 'none',
-                    color: '#64748B',
+                    color: location.pathname === '/settings' ? 'var(--color-primary)' : '#64748B',
+                    background: location.pathname === '/settings' ? 'rgba(30, 136, 229, 0.08)' : 'transparent',
                     fontWeight: 600,
                     fontSize: '0.9rem'
                 }}>
-                    <Settings size={20} style={{ flexShrink: 0 }} />
+                    <Settings size={20} style={{ flexShrink: 0, color: location.pathname === '/settings' ? 'var(--color-primary)' : 'inherit' }} />
                     {isOpen && <span>Cấu hình</span>}
                 </Link>
                 <button

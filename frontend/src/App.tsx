@@ -40,6 +40,7 @@ const InterviewDetailPage = lazy(() => import('./pages/employer/InterviewDetailP
 const PartnershipJobsPage = lazy(() => import('./pages/employer/PartnershipJobsPage'));
 const EmployerSchoolsPage = lazy(() => import('./pages/employer/EmployerSchoolsPage'));
 const InternEvaluationPage = lazy(() => import('./pages/employer/InternEvaluationPage'));
+const PendingRecruitmentsPage = lazy(() => import('./pages/employer/PendingRecruitmentsPage'));
 
 // School Pages
 const SchoolDashboardPage = lazy(() => import('./pages/school/SchoolDashboardPage'));
@@ -58,8 +59,15 @@ const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 const AdminMIQuestionsPage = lazy(() => import('./pages/admin/AdminMIQuestionsPage'));
+const MITestPage = lazy(() => import('./pages/candidate/MITestPage'));
+const CandidateInterviewSchedulePage = lazy(() => import('./pages/candidate/InterviewSchedulePage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+
+
 
 const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage'));
+const ChatPage = lazy(() => import('./pages/ChatPage'));
+
 
 // Layout
 import Navbar from './components/Navbar';
@@ -119,9 +127,13 @@ function AppRoutes() {
     location.pathname.startsWith('/employer/') ||
     location.pathname.startsWith('/admin/') ||
     location.pathname.startsWith('/school/') ||
-    location.pathname.startsWith('/candidate/');
+    location.pathname.startsWith('/candidate/') ||
+    location.pathname.startsWith('/chat') ||
+    location.pathname === '/profile' ||
+    location.pathname === '/settings';
 
   const showSidebar = !!user && isDashboardRoute;
+
 
   return (
     <>
@@ -187,6 +199,15 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <ProfilePage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/settings"
+              element={
+                <PrivateRoute>
+                  <SettingsPage />
                 </PrivateRoute>
               }
             />
@@ -263,6 +284,24 @@ function AppRoutes() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/candidate/mi-test"
+              element={
+                <PrivateRoute>
+                  <MITestPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/candidate/interviews"
+              element={
+                <PrivateRoute>
+                  <CandidateInterviewSchedulePage />
+                </PrivateRoute>
+              }
+            />
+
+
 
             {/* Employer Routes */}
             <Route
@@ -400,6 +439,15 @@ function AppRoutes() {
               }
             />
 
+            <Route
+              path="/employer/recruitment-decisions"
+              element={
+                <PrivateRoute>
+                  <PendingRecruitmentsPage />
+                </PrivateRoute>
+              }
+            />
+
             {/* School Routes */}
             <Route
               path="/school/dashboard"
@@ -518,6 +566,22 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <AdminMIQuestionsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <PrivateRoute>
+                  <ChatPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/chat/:conversationId"
+              element={
+                <PrivateRoute>
+                  <ChatPage />
                 </PrivateRoute>
               }
             />

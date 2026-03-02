@@ -662,9 +662,10 @@ export default function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps =
                         </button>
 
                         {/* Messages */}
-                        <button className="navbar-icon-btn">
+                        <button className="navbar-icon-btn" onClick={() => navigate('/chat')}>
                             <FiMessageSquare size={20} />
                         </button>
+
 
                         {/* User Avatar & Dropdown */}
                         <div style={{ position: 'relative' }}>

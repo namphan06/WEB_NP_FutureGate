@@ -91,13 +91,15 @@ export default function AppliedJobsPage() {
     };
 
     const getStatusBadge = (status: string) => {
-        switch (status) {
+        switch (status.toLowerCase()) {
+            case 'hired':
+                return <span className="badge badge-success" style={{ background: '#10B981', color: 'white' }}><FiCheckCircle size={14} /> Trúng tuyển</span>;
             case 'accepted':
-                return <span className="badge badge-success"><FiCheckCircle size={14} /> Đã duyệt</span>;
+                return <span className="badge badge-success"><FiCheckCircle size={14} /> Đang đánh giá</span>;
             case 'rejected':
                 return <span className="badge badge-error"><FiXCircle size={14} /> Từ chối</span>;
             default:
-                return <span className="badge badge-warning"><FiClock size={14} /> Chờ duyệt</span>;
+                return <span className="badge badge-warning"><FiClock size={14} /> Chờ duyệt CV</span>;
         }
     };
 

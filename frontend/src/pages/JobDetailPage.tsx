@@ -6,14 +6,17 @@ import { useAuth } from '../contexts/AuthContext';
 import {
     FiMapPin, FiDollarSign, FiBriefcase, FiClock, FiCheckCircle,
     FiBookmark, FiShare2, FiHome, FiChevronRight, FiCalendar,
-    FiUsers, FiAward
+    FiUsers, FiAward, FiMessageSquare
 } from 'react-icons/fi';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
+import { ChatService } from '../lib/chatService';
 
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, profile } = useAuth();
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [applying, setApplying] = useState(false);
@@ -88,7 +91,7 @@ export default function JobDetailPage() {
                 // Fetch employer profile
                 const { data: employerData, error: employerError } = await supabase
                     .from('profiles')
-                    .select('id, full_name, company_name, avatar_url, email, phone, metadata')
+                    .select('id, full_name, company_name, avatar_url, email, phone, metadata, role')
                     .eq('id', jobData.creator_id)
                     .single();
 
@@ -141,6 +144,24 @@ export default function JobDetailPage() {
         // TODO: Implement save to database
     };
 
+    const handleChat = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
+        if (!job?.creator_id) return;
+
+        const otherUserRole = job.profiles?.role || 'employer';
+        const conv = await ChatService.getOrCreateConversation(job.creator_id, otherUserRole, job.id);
+
+        if (conv) {
+            navigate(`/chat/${conv.id}`);
+        } else {
+            alert('Không thể khởi tạo cuộc trò chuyện. Vui lòng thử lại sau.');
+        }
+    };
+
     const handleShare = () => {
         if (navigator.share) {
             navigator.share({
@@ -152,6 +173,7 @@ export default function JobDetailPage() {
             alert('Đã copy link!');
         }
     };
+
 
     const formatSalary = (salary: any) => {
         if (!salary || salary.is_negotiable) return 'Thỏa thuận';
@@ -330,6 +352,15 @@ export default function JobDetailPage() {
                                                 </button>
 
                                                 <button
+                                                    onClick={handleChat}
+                                                    className="btn btn-outline-primary"
+                                                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                                                >
+                                                    <FiMessageSquare size={18} />
+                                                    Nhắn tin
+                                                </button>
+
+                                                <button
                                                     onClick={handleSave}
                                                     className="btn btn-outline-primary"
                                                     style={{
@@ -341,39 +372,51 @@ export default function JobDetailPage() {
                                                 </button>
                                             </>
                                         ) : (
-                                            <div style={{
-                                                padding: 'var(--spacing-md) var(--spacing-lg)',
-                                                background: 'var(--color-success-light)',
-                                                borderRadius: 'var(--radius-md)',
-                                                border: '1px solid var(--color-success)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 'var(--spacing-md)',
-                                                flex: 1
-                                            }}>
+                                            <>
                                                 <div style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    borderRadius: '50%',
-                                                    background: 'var(--color-success)',
+                                                    padding: 'var(--spacing-md) var(--spacing-lg)',
+                                                    background: 'var(--color-success-light)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    border: '1px solid var(--color-success)',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: 'white'
+                                                    gap: 'var(--spacing-md)',
+                                                    flex: 1
                                                 }}>
-                                                    <FiCheckCircle size={24} />
-                                                </div>
-                                                <div>
-                                                    <div style={{ fontWeight: 700, color: 'var(--color-success-dark)', fontSize: '1.1rem' }}>
-                                                        Bạn đã ứng tuyển công việc này
+                                                    <div style={{
+                                                        width: '40px',
+                                                        height: '40px',
+                                                        borderRadius: '50%',
+                                                        background: 'var(--color-success)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white'
+                                                    }}>
+                                                        <FiCheckCircle size={24} />
                                                     </div>
-                                                    <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-                                                        <FiBriefcase size={14} />
-                                                        CV đã nộp: <strong style={{ color: 'var(--color-primary)' }}>{applicationInfo.cvTitle}</strong>
+                                                    <div>
+                                                        <div style={{ fontWeight: 700, color: 'var(--color-success-dark)', fontSize: '1.1rem' }}>
+                                                            Bạn đã ứng tuyển công việc này
+                                                        </div>
+                                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+                                                            <FiBriefcase size={14} />
+                                                            CV đã nộp: <strong style={{ color: 'var(--color-primary)' }}>{applicationInfo.cvTitle}</strong>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+
+                                                <button
+                                                    onClick={handleChat}
+                                                    className="btn btn-outline-primary"
+                                                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                                                >
+                                                    <FiMessageSquare size={18} />
+                                                    Nhắn tin
+                                                </button>
+                                            </>
                                         )}
+
 
                                         <button
                                             onClick={handleShare}

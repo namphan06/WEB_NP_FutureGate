@@ -181,6 +181,7 @@ export default function JobApplicantsPage() {
             case 'pending': return 'var(--color-warning)';
             case 'viewed': return 'var(--color-info)';
             case 'accepted': return 'var(--color-success)';
+            case 'hired': return '#10B981';
             case 'rejected': return 'var(--color-error)';
             default: return 'var(--color-text-secondary)';
         }
@@ -188,9 +189,10 @@ export default function JobApplicantsPage() {
 
     const getStatusText = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'pending': return 'Đang chờ';
+            case 'pending': return 'Chờ duyệt CV';
             case 'viewed': return 'Đã xem';
-            case 'accepted': return 'Được nhận';
+            case 'accepted': return 'Đang đánh giá';
+            case 'hired': return 'Trúng tuyển';
             case 'rejected': return 'Từ chối';
             default: return status;
         }
@@ -256,9 +258,9 @@ export default function JobApplicantsPage() {
                             onChange={(e) => setStatusFilter(e.target.value)}
                         >
                             <option value="All">Tất cả trạng thái</option>
-                            <option value="Pending">Đang chờ</option>
-                            <option value="Viewed">Đã xem</option>
-                            <option value="Accepted">Được nhận</option>
+                            <option value="Pending">Chờ duyệt CV</option>
+                            <option value="Accepted">Đang đánh giá</option>
+                            <option value="Hired">Trúng tuyển</option>
                             <option value="Rejected">Từ chối</option>
                         </select>
                         <FiFilter style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--color-text-secondary)' }} />
@@ -352,11 +354,11 @@ export default function JobApplicantsPage() {
                                             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
                                                 <button
                                                     className="btn btn-sm"
-                                                    style={{ flex: 1, background: 'var(--color-success)', color: 'white' }}
+                                                    style={{ flex: 1, background: 'var(--color-primary)', color: 'white' }}
                                                     onClick={() => updateStatus(app.userId, 'Accepted')}
                                                 >
                                                     <FiCheck size={16} />
-                                                    Duyệt
+                                                    Duyệt CV
                                                 </button>
                                                 <button
                                                     className="btn btn-sm"

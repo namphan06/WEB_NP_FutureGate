@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Navigate } from 'react-router-dom';
-import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiMapPin, FiHeart } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiMail, FiPhone, FiMapPin, FiHeart, FiMessageSquare } from 'react-icons/fi';
+import { ChatService } from '../../lib/chatService';
+import { useNavigate } from 'react-router-dom';
+
 
 interface CandidateMetadata {
     bio?: string;
@@ -35,6 +38,7 @@ interface Candidate {
 
 export default function SearchCandidatesPage() {
     const { profile } = useAuth();
+    const navigate = useNavigate();
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +49,16 @@ export default function SearchCandidatesPage() {
     if (profile?.role !== 'employer') {
         return <Navigate to="/" />;
     }
+
+    const handleChat = async (candidateId: string) => {
+        const conv = await ChatService.getOrCreateConversation(candidateId, 'candidate');
+        if (conv) {
+            navigate(`/chat/${conv.id}`);
+        } else {
+            alert('Không thể kết nối chat lúc này');
+        }
+    };
+
 
     useEffect(() => {
         fetchCandidates();
@@ -481,14 +495,26 @@ export default function SearchCandidatesPage() {
                                                 {/* Actions */}
                                                 <div className="flex gap-md">
                                                     <button
+                                                        className="btn btn-outline-primary"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleChat(candidate.id);
+                                                        }}
+                                                    >
+                                                        <FiMessageSquare size={18} />
+                                                        Nhắn tin
+                                                    </button>
+                                                    <button
                                                         className="btn btn-primary"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             window.open(`mailto:${candidate.email}`, '_blank');
                                                         }}
                                                     >
-                                                        Liên hệ qua Email
+                                                        <FiMail size={18} />
+                                                        Gửi Email
                                                     </button>
+
                                                     {metadata?.cv_ids && metadata.cv_ids.length > 0 && (
                                                         <button
                                                             className="btn btn-outline"

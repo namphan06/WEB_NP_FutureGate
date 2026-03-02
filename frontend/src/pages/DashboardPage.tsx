@@ -57,7 +57,8 @@ export default function DashboardPage() {
     const [stats, setStats] = useState({
         totalJobs: 0,
         newApplicants: 0,
-        totalApplicants: 0
+        totalApplicants: 0,
+        pendingDecisions: 0
     });
     const [recentJobs, setRecentJobs] = useState<Job[]>([]);
     const [recentApplicants, setRecentApplicants] = useState<ApplicantWithDetails[]>([]);
@@ -84,37 +85,60 @@ export default function DashboardPage() {
                 .eq('creator_id', user.id)
                 .order('created_at', { ascending: false });
 
+            // Fetch partnership jobs
+            const { data: partnershipJobs } = await supabase
+                .from('school_partnership_jobs')
+                .select('*')
+                .eq('employer_id', user.id)
+                .eq('company_status', 'accepted');
+
             if (jobsError) throw jobsError;
 
             const jobs = allJobs || [];
+            const pJobs = partnershipJobs || [];
 
-            // Calculate stats
-            const totalJobs = jobs.length;
-            const totalApplicants = jobs.reduce((sum, job) => sum + (job.applicants?.length || 0), 0);
-
-            // Get applicants from last 7 days
+            // Get applicants from last 7 days & pending decisions
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
             let newApplicantsCount = 0;
+            let pendingDecisionsCount = 0;
+            let totalApplicantsCount = 0;
             const allApplicants: ApplicantWithDetails[] = [];
 
-            // Process applicants from all jobs
-            for (const job of jobs) {
-                if (job.applicants && job.applicants.length > 0) {
-                    for (const applicant of job.applicants) {
-                        const appliedDate = new Date(applicant.applied_at);
-                        if (appliedDate >= sevenDaysAgo) {
-                            newApplicantsCount++;
-                        }
+            // Process regular jobs
+            jobs.forEach(job => {
+                const jobApplicants = Array.isArray(job.applicants) ? job.applicants : [];
+                totalApplicantsCount += jobApplicants.length;
+                jobApplicants.forEach((applicant: any) => {
+                    const appliedDate = new Date(applicant.applied_at);
+                    if (appliedDate >= sevenDaysAgo) newApplicantsCount++;
+                    const status = (applicant.status || 'pending').toLowerCase();
+                    if (status === 'pending' || status === 'accepted') pendingDecisionsCount++;
 
-                        allApplicants.push({
-                            ...applicant,
-                            jobTitle: job.metadata.title
-                        });
-                    }
-                }
-            }
+                    allApplicants.push({
+                        ...applicant,
+                        jobTitle: job.metadata?.title || 'Công việc không tên'
+                    });
+                });
+            });
+
+            // Process partnership jobs
+            pJobs.forEach(job => {
+                const jobApplicants = Array.isArray(job.applicants) ? job.applicants : [];
+                totalApplicantsCount += jobApplicants.length;
+                jobApplicants.forEach((applicant: any) => {
+                    const appliedDate = new Date(applicant.applied_at);
+                    if (appliedDate >= sevenDaysAgo) newApplicantsCount++;
+                    const status = (applicant.status || 'pending').toLowerCase();
+                    if (status === 'pending' || status === 'accepted') pendingDecisionsCount++;
+
+                    allApplicants.push({
+                        ...applicant,
+                        jobTitle: job.metadata?.title || 'Công việc liên kết'
+                    });
+                });
+            });
 
             // Sort applicants by applied_at and get recent 5
             allApplicants.sort((a, b) =>
@@ -143,9 +167,10 @@ export default function DashboardPage() {
             }
 
             setStats({
-                totalJobs,
+                totalJobs: jobs.length + pJobs.length,
                 newApplicants: newApplicantsCount,
-                totalApplicants
+                totalApplicants: totalApplicantsCount,
+                pendingDecisions: pendingDecisionsCount
             });
             setRecentJobs(jobs.slice(0, 3));
             setRecentApplicants(recentApplicantsList);
@@ -225,29 +250,39 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-3" style={{ gap: '1.5rem' }}>
-                        <div className="card" style={{ padding: '2rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <div style={{ width: '64px', height: '64px', background: 'rgba(30, 136, 229, 0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: '1.25rem' }}>
-                                <FiBriefcase size={32} />
+                    <div className="grid grid-cols-4" style={{ gap: '1rem' }}>
+                        <div className="card" style={{ padding: '1.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div style={{ width: '56px', height: '56px', background: 'rgba(30, 136, 229, 0.1)', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: '1rem' }}>
+                                <FiBriefcase size={28} />
                             </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.5rem' }}>{stats.totalJobs}</div>
-                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0 }}>Tin tuyển dụng</p>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.4rem' }}>{stats.totalJobs}</div>
+                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0, fontSize: '0.85rem' }}>Tin tuyển dụng</p>
                         </div>
 
-                        <div className="card" style={{ padding: '2rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <div style={{ width: '64px', height: '64px', background: 'rgba(30, 178, 93, 0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1E7E34', marginBottom: '1.25rem' }}>
-                                <FiUser size={32} />
+                        <div className="card" style={{ padding: '1.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div style={{ width: '56px', height: '56px', background: 'rgba(30, 178, 93, 0.1)', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1E7E34', marginBottom: '1rem' }}>
+                                <FiUser size={28} />
                             </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.5rem' }}>{stats.newApplicants}</div>
-                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0 }}>Ứng viên mới (7 ngày)</p>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.4rem' }}>{stats.newApplicants}</div>
+                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0, fontSize: '0.85rem' }}>Ứng viên mới</p>
                         </div>
 
-                        <div className="card" style={{ padding: '2rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <div style={{ width: '64px', height: '64px', background: 'rgba(2, 136, 209, 0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0288D1', marginBottom: '1.25rem' }}>
-                                <FiUsers size={32} />
+                        <div className="card"
+                            onClick={() => navigate('/employer/recruitment-decisions')}
+                            style={{ padding: '1.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', cursor: 'pointer', border: stats.pendingDecisions > 0 ? '1.5px solid #FFAB00' : 'none' }}>
+                            <div style={{ width: '56px', height: '56px', background: '#FFF8E1', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFAB00', marginBottom: '1rem' }}>
+                                <FiClock size={28} />
                             </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.5rem' }}>{stats.totalApplicants}</div>
-                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0 }}>Tổng hồ sơ</p>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.4rem' }}>{stats.pendingDecisions}</div>
+                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0, fontSize: '0.85rem' }}>Đang chờ xử lý</p>
+                        </div>
+
+                        <div className="card" style={{ padding: '1.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div style={{ width: '56px', height: '56px', background: 'rgba(2, 136, 209, 0.1)', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0288D1', marginBottom: '1rem' }}>
+                                <FiUsers size={28} />
+                            </div>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.4rem' }}>{stats.totalApplicants}</div>
+                            <p style={{ color: 'var(--color-text-secondary)', fontWeight: 600, margin: 0, fontSize: '0.85rem' }}>Tổng hồ sơ</p>
                         </div>
                     </div>
 
