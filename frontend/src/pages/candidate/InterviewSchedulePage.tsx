@@ -3,8 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
     Calendar as CalendarIcon, Clock, MapPin,
-    Video, Users, ChevronRight, AlertCircle,
-    CheckCircle2, XCircle
+    Video, Users, AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';

@@ -50,7 +50,6 @@ export default function AdminAnalyticsPage() {
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState<7 | 30 | 90 | 365>(7);
 
-    // Stats
     const [overviewStats, setOverviewStats] = useState<OverviewStats>({
         totalUsers: 0,
         newUsers: 0,
@@ -63,12 +62,10 @@ export default function AdminAnalyticsPage() {
         applicationSuccessRate: 0
     });
 
-    // Trends
     const [usersTrend, setUsersTrend] = useState<TrendData[]>([]);
     const [jobsTrend, setJobsTrend] = useState<TrendData[]>([]);
     const [applicationsTrend, setApplicationsTrend] = useState<TrendData[]>([]);
 
-    // Distributions
     const [usersDistribution, setUsersDistribution] = useState<DistributionData>({});
     const [jobsDistribution, setJobsDistribution] = useState<DistributionData>({});
 
@@ -82,7 +79,6 @@ export default function AdminAnalyticsPage() {
             const periodStart = new Date();
             periodStart.setDate(periodStart.getDate() - selectedPeriod);
 
-            // Load all users
             const { data: allUsers } = await supabase
                 .from('profiles')
                 .select('id, role, created_at');
@@ -92,7 +88,6 @@ export default function AdminAnalyticsPage() {
                 new Date(u.created_at) > periodStart
             ).length || 0;
 
-            // Load all jobs
             const { data: allJobs } = await supabase
                 .from('jobs')
                 .select('id, status, created_at, deadline, applicants');
@@ -102,7 +97,6 @@ export default function AdminAnalyticsPage() {
                 new Date(j.created_at) > periodStart
             ).length || 0;
 
-            // Calculate applications
             let totalApplications = 0;
             let newApplications = 0;
             let acceptedApplications = 0;
@@ -125,7 +119,6 @@ export default function AdminAnalyticsPage() {
                 ? (acceptedApplications / totalApplications * 100)
                 : 0;
 
-            // Load interviews
             const { data: allInterviews } = await supabase
                 .from('interview_schedules')
                 .select('id, created_at');
@@ -147,7 +140,6 @@ export default function AdminAnalyticsPage() {
                 applicationSuccessRate: parseFloat(applicationSuccessRate.toFixed(2))
             });
 
-            // Calculate distributions
             const usersDist: DistributionData = {};
             allUsers?.forEach(user => {
                 const role = user.role || 'candidate';
@@ -165,11 +157,9 @@ export default function AdminAnalyticsPage() {
             });
             setJobsDistribution(jobsDist);
 
-            // Calculate trends
             setUsersTrend(groupByDay(allUsers?.filter(u => new Date(u.created_at) > periodStart) || [], 'created_at', selectedPeriod));
             setJobsTrend(groupByDay(allJobs?.filter(j => new Date(j.created_at) > periodStart) || [], 'created_at', selectedPeriod));
 
-            // Applications trend
             const applications: any[] = [];
             allJobs?.forEach(job => {
                 const applicants = job.applicants || [];
@@ -195,7 +185,6 @@ export default function AdminAnalyticsPage() {
         const grouped: Record<string, number> = {};
         const now = new Date();
 
-        // Initialize all days with 0
         for (let i = 0; i < days; i++) {
             const date = new Date(now);
             date.setDate(date.getDate() - (days - i - 1));
@@ -203,7 +192,6 @@ export default function AdminAnalyticsPage() {
             grouped[key] = 0;
         }
 
-        // Count items by day
         items.forEach(item => {
             const date = new Date(item[dateField]);
             const key = `${date.getMonth() + 1}/${date.getDate()}`;
@@ -231,7 +219,6 @@ export default function AdminAnalyticsPage() {
         }
     };
 
-    // Chart colors
     const COLORS = {
         primary: '#1E88E5',
         success: '#43A047',
@@ -244,7 +231,6 @@ export default function AdminAnalyticsPage() {
     const ROLE_COLORS = ['#1E88E5', '#FB8C00', '#43A047', '#8E24AA'];
     const STATUS_COLORS = ['#43A047', '#E53935'];
 
-    // Transform distribution data for pie charts
     const getUsersPieData = () => {
         return Object.entries(usersDistribution).map(([name, value]) => ({
             name: getRoleLabel(name),
@@ -271,103 +257,93 @@ export default function AdminAnalyticsPage() {
 
     if (loading && !refreshing) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div className="spinner" style={{
-                        width: '48px',
-                        height: '48px',
-                        border: '4px solid #f3f3f3',
-                        borderTop: '4px solid var(--color-primary)',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                        margin: '0 auto 1rem'
-                    }}></div>
-                    <p style={{ color: 'var(--color-text-secondary)' }}>Đang tải dữ liệu thống kê...</p>
+            <div className="admin-analytics-page" style={{ padding: 'var(--spacing-2xl)', minHeight: '100vh', background: 'var(--color-background-alt)' }}>
+                <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
+                    <div className="skeleton" style={{ height: '48px', width: '280px', marginBottom: 'var(--spacing-md)', borderRadius: 'var(--radius-lg)' }} />
+                    <div className="skeleton" style={{ height: '24px', width: '200px', borderRadius: 'var(--radius-md)' }} />
+                </div>
+
+                <div className="admin-stats-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                    {[0, 1, 2, 3].map(idx => (
+                        <div key={idx} className="stat-card-glass" style={{ padding: 'var(--spacing-xl)', borderRadius: 'var(--radius-2xl)', animationDelay: `${idx * 100}ms` }}>
+                            <div className="skeleton" style={{ width: '52px', height: '52px', borderRadius: '14px', marginBottom: 'var(--spacing-lg)' }} />
+                            <div className="skeleton" style={{ height: '40px', width: '80px', marginBottom: 'var(--spacing-sm)' }} />
+                            <div className="skeleton" style={{ height: '20px', width: '120px' }} />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="admin-charts-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                    {[0, 1, 2, 3].map(idx => (
+                        <div key={idx} className="card" style={{ padding: 'var(--spacing-xl)', borderRadius: 'var(--radius-2xl)' }}>
+                            <div className="skeleton skeleton-title" style={{ marginBottom: 'var(--spacing-xl)' }} />
+                            <div className="skeleton" style={{ height: '200px', borderRadius: 'var(--radius-md)' }} />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="admin-charts-grid">
+                    {[0, 1].map(idx => (
+                        <div key={idx} className="card" style={{ padding: 'var(--spacing-xl)', borderRadius: 'var(--radius-2xl)' }}>
+                            <div className="skeleton skeleton-title" style={{ marginBottom: 'var(--spacing-xl)' }} />
+                            <div className="skeleton" style={{ height: '250px', borderRadius: 'var(--radius-md)' }} />
+                        </div>
+                    ))}
                 </div>
             </div>
         );
     }
 
     return (
-        <div style={{ padding: '2rem 50px', maxWidth: '100%', minHeight: '100vh', background: '#F8FAFC' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '2.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                    <div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.5rem', color: '#1E293B' }}>
-                            📊 Báo cáo & Phân tích
-                        </h1>
-                        <p style={{ fontSize: '1.1rem', color: '#64748B' }}>
-                            Reports & Analytics
-                        </p>
-                    </div>
-                    <button
-                        onClick={handleRefresh}
-                        disabled={refreshing}
-                        className="btn btn-outline-primary"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            height: '54px',
-                            padding: '0 2rem',
-                            borderRadius: '16px',
-                            fontWeight: 700,
-                            opacity: refreshing ? 0.6 : 1
-                        }}
-                    >
-                        <RefreshCw size={18} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
-                        Làm mới
-                    </button>
+        <div className="admin-analytics-page" style={{ padding: 'var(--spacing-2xl)', minHeight: '100vh', background: 'var(--color-background-alt)' }}>
+            <div className="admin-header" style={{ marginBottom: 'var(--spacing-3xl)' }}>
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, marginBottom: 'var(--spacing-sm)', color: 'var(--color-text)' }}>
+                        Báo cáo & Phân tích
+                    </h1>
+                    <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)' }}>
+                        Reports & Analytics
+                    </p>
                 </div>
-
-                {/* Time Period Selector */}
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    {[
-                        { value: 7 as const, label: '7 ngày' },
-                        { value: 30 as const, label: '30 ngày' },
-                        { value: 90 as const, label: '90 ngày' },
-                        { value: 365 as const, label: '1 năm' }
-                    ].map(period => (
-                        <button
-                            key={period.value}
-                            onClick={() => setSelectedPeriod(period.value)}
-                            style={{
-                                padding: '0.625rem 1.25rem',
-                                borderRadius: '12px',
-                                border: selectedPeriod === period.value ? '2px solid var(--color-primary)' : '1px solid #E2E8F0',
-                                background: selectedPeriod === period.value ? 'rgba(30, 136, 229, 0.08)' : 'white',
-                                color: selectedPeriod === period.value ? 'var(--color-primary)' : '#64748B',
-                                fontWeight: selectedPeriod === period.value ? 700 : 500,
-                                fontSize: '0.875rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                boxShadow: selectedPeriod === period.value ? '0 4px 12px rgba(30, 136, 229, 0.2)' : 'none'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (selectedPeriod !== period.value) {
-                                    e.currentTarget.style.background = '#F1F5F9';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (selectedPeriod !== period.value) {
-                                    e.currentTarget.style.background = 'white';
-                                }
-                            }}
-                        >
-                            {period.label}
-                        </button>
-                    ))}
-                </div>
+                <button
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    className="btn btn-outline-primary"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--spacing-sm)',
+                        height: '54px',
+                        padding: '0 var(--spacing-xl)',
+                        borderRadius: 'var(--radius-lg)',
+                        fontWeight: 700,
+                        opacity: refreshing ? 0.6 : 1,
+                        flexShrink: 0
+                    }}
+                >
+                    <RefreshCw size={18} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+                    Làm mới
+                </button>
             </div>
 
-            {/* Overview Stats Cards */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: '1.5rem',
-                marginBottom: '2.5rem'
-            }}>
+            <div className="admin-period-selector" style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', marginBottom: 'var(--spacing-2xl)' }}>
+                {[
+                    { value: 7 as const, label: '7 ngày' },
+                    { value: 30 as const, label: '30 ngày' },
+                    { value: 90 as const, label: '90 ngày' },
+                    { value: 365 as const, label: '1 năm' }
+                ].map(period => (
+                    <button
+                        key={period.value}
+                        onClick={() => setSelectedPeriod(period.value)}
+                        className={selectedPeriod === period.value ? 'active' : ''}
+                    >
+                        {period.label}
+                    </button>
+                ))}
+            </div>
+
+            <div className="admin-stats-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
                 <StatCard
                     icon={<Users size={28} />}
                     label="Người dùng"
@@ -398,9 +374,7 @@ export default function AdminAnalyticsPage() {
                 />
             </div>
 
-            {/* Detailed Charts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
-                {/* Users Trend */}
+            <div className="admin-charts-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
                 <ChartCard
                     title="Người dùng mới"
                     subtitle={`+${overviewStats.newUsers} trong ${getPeriodLabel()} qua`}
@@ -432,7 +406,6 @@ export default function AdminAnalyticsPage() {
                     </ResponsiveContainer>
                 </ChartCard>
 
-                {/* Jobs Trend */}
                 <ChartCard
                     title="Việc làm đăng"
                     subtitle={`+${overviewStats.newJobs} trong ${getPeriodLabel()} qua`}
@@ -464,7 +437,6 @@ export default function AdminAnalyticsPage() {
                     </ResponsiveContainer>
                 </ChartCard>
 
-                {/* Applications Trend */}
                 <ChartCard
                     title="Ứng tuyển"
                     subtitle={`+${overviewStats.newApplications} trong ${getPeriodLabel()} qua`}
@@ -489,7 +461,6 @@ export default function AdminAnalyticsPage() {
                     </ResponsiveContainer>
                 </ChartCard>
 
-                {/* Success Rate */}
                 <ChartCard
                     title="Tỷ lệ thành công"
                     subtitle="Ứng tuyển được duyệt"
@@ -501,7 +472,8 @@ export default function AdminAnalyticsPage() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: '200px',
-                        gap: '2rem'
+                        gap: 'var(--spacing-xl)',
+                        flexWrap: 'wrap'
                     }}>
                         <div style={{ position: 'relative', width: '120px', height: '120px' }}>
                             <svg width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
@@ -544,10 +516,10 @@ export default function AdminAnalyticsPage() {
                             <div style={{ fontSize: '2rem', fontWeight: 700, color: COLORS.purple }}>
                                 {Math.round((overviewStats.applicationSuccessRate / 100) * overviewStats.totalApplications)}
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: '#64748B' }}>
+                            <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
                                 Đã được duyệt
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: '#64748B', marginTop: '0.5rem' }}>
+                            <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginTop: 'var(--spacing-sm)' }}>
                                 Từ {overviewStats.totalApplications} đơn
                             </div>
                         </div>
@@ -555,16 +527,14 @@ export default function AdminAnalyticsPage() {
                 </ChartCard>
             </div>
 
-            {/* Distribution Charts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                {/* Users by Role */}
+            <div className="admin-charts-grid">
                 <ChartCard
                     title="Người dùng theo vai trò"
                     subtitle="Phân bố theo loại tài khoản"
                     icon={<Users size={20} />}
                     color={COLORS.primary}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', height: '250px' }}>
+                    <div className="chart-pie-container">
                         <ResponsiveContainer width="50%" height="100%">
                             <PieChart>
                                 <Pie
@@ -589,9 +559,9 @@ export default function AdminAnalyticsPage() {
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    marginBottom: '0.75rem'
+                                    marginBottom: 'var(--spacing-md)'
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                                         <div style={{
                                             width: '12px',
                                             height: '12px',
@@ -609,14 +579,13 @@ export default function AdminAnalyticsPage() {
                     </div>
                 </ChartCard>
 
-                {/* Jobs by Status */}
                 <ChartCard
                     title="Việc làm theo trạng thái"
                     subtitle="Phân bố theo tình trạng"
                     icon={<Briefcase size={20} />}
                     color={COLORS.success}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', height: '250px' }}>
+                    <div className="chart-pie-container">
                         <ResponsiveContainer width="50%" height="100%">
                             <PieChart>
                                 <Pie
@@ -641,9 +610,9 @@ export default function AdminAnalyticsPage() {
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    marginBottom: '0.75rem'
+                                    marginBottom: 'var(--spacing-md)'
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                                         <div style={{
                                             width: '12px',
                                             height: '12px',
@@ -667,12 +636,96 @@ export default function AdminAnalyticsPage() {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+
+                .admin-stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: var(--spacing-lg);
+                }
+                @media (max-width: 1279px) {
+                    .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+                }
+                @media (max-width: 767px) {
+                    .admin-stats-grid { grid-template-columns: 1fr; }
+                }
+
+                .admin-charts-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: var(--spacing-xl);
+                }
+                @media (max-width: 1023px) {
+                    .admin-charts-grid { grid-template-columns: 1fr; }
+                }
+
+                .admin-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    gap: var(--spacing-lg);
+                    flex-wrap: wrap;
+                }
+                @media (max-width: 767px) {
+                    .admin-header { flex-direction: column; align-items: flex-start; }
+                }
+
+                .admin-period-selector button {
+                    padding: var(--spacing-md) var(--spacing-lg);
+                    border-radius: var(--radius-md);
+                    border: 1px solid var(--color-border);
+                    background: white;
+                    color: var(--color-text-secondary);
+                    font-weight: 500;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    transition: all var(--transition-base);
+                    white-space: nowrap;
+                }
+                .admin-period-selector button.active {
+                    border: 2px solid var(--color-primary);
+                    background: rgba(30, 136, 229, 0.08);
+                    color: var(--color-primary);
+                    font-weight: 700;
+                    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+                }
+                .admin-period-selector button:hover:not(.active) {
+                    background: var(--color-border-light);
+                }
+
+                .stat-card-glass {
+                    background: var(--glass-bg);
+                    backdrop-filter: var(--glass-blur);
+                    -webkit-backdrop-filter: var(--glass-blur);
+                    border: 1px solid var(--glass-border);
+                    box-shadow: var(--glass-shadow);
+                    transition: all var(--transition-base);
+                }
+                .stat-card-glass:hover {
+                    transform: translateY(-4px);
+                    box-shadow: var(--shadow-lg);
+                }
+
+                .chart-pie-container {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-xl);
+                    height: 250px;
+                }
+                @media (max-width: 767px) {
+                    .chart-pie-container {
+                        flex-direction: column;
+                        height: auto;
+                    }
+                    .chart-pie-container > .recharts-responsive-container {
+                        width: 100% !important;
+                        height: 200px !important;
+                    }
+                }
             `}</style>
         </div>
     );
 }
 
-// Stat Card Component
 interface StatCardProps {
     icon: React.ReactNode;
     label: string;
@@ -683,23 +736,14 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, change, color }: StatCardProps) {
     return (
-        <div style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '24px',
-            border: '1px solid #E2E8F0',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer',
-            position: 'relative',
-            overflow: 'hidden'
-        }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.05)';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+        <div className="stat-card-glass animate-fade-in-up"
+            style={{
+                padding: 'var(--spacing-xl)',
+                borderRadius: 'var(--radius-2xl)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all var(--transition-base)',
+                cursor: 'pointer'
             }}
         >
             <div style={{
@@ -720,22 +764,23 @@ function StatCard({ icon, label, value, change, color }: StatCardProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: color,
-                marginBottom: '1.5rem'
+                marginBottom: 'var(--spacing-lg)'
             }}>
                 {icon}
             </div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1E293B', marginBottom: '0.25rem' }}>
+            <div style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 900, color: 'var(--color-text)', marginBottom: 'var(--spacing-xs)' }}>
                 {value.toLocaleString()}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#64748B', fontWeight: 600, fontSize: '0.95rem' }}>{label}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
+                <span style={{ color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '0.95rem' }}>{label}</span>
                 <span style={{
-                    padding: '0.375rem 0.75rem',
-                    borderRadius: '20px',
+                    padding: 'var(--spacing-xs) var(--spacing-md)',
+                    borderRadius: 'var(--radius-full)',
                     background: change > 0 ? '#E8F5E9' : '#FFF3E0',
                     color: change > 0 ? '#43A047' : '#FB8C00',
                     fontSize: '0.8125rem',
-                    fontWeight: 700
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap'
                 }}>
                     +{change}
                 </span>
@@ -744,7 +789,6 @@ function StatCard({ icon, label, value, change, color }: StatCardProps) {
     );
 }
 
-// Chart Card Component
 interface ChartCardProps {
     title: string;
     subtitle: string;
@@ -755,31 +799,31 @@ interface ChartCardProps {
 
 function ChartCard({ title, subtitle, icon, color, children }: ChartCardProps) {
     return (
-        <div style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '28px',
-            border: '1px solid #E2E8F0'
+        <div className="card animate-fade-in-up" style={{
+            padding: 'var(--spacing-xl)',
+            borderRadius: 'var(--radius-2xl)',
+            border: '1px solid var(--color-border)'
         }}>
-            <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-sm)' }}>
                     <div style={{
                         width: '40px',
                         height: '40px',
-                        borderRadius: '10px',
+                        borderRadius: 'var(--radius-md)',
                         background: `${color}15`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: color
+                        color: color,
+                        flexShrink: 0
                     }}>
                         {icon}
                     </div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1E293B', margin: 0 }}>
+                    <h3 style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)', fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
                         {title}
                     </h3>
                 </div>
-                <p style={{ fontSize: '0.875rem', color: '#64748B', margin: 0, paddingLeft: '3.25rem' }}>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', margin: 0, paddingLeft: '3.25rem' }}>
                     {subtitle}
                 </p>
             </div>

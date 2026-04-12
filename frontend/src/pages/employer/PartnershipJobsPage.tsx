@@ -13,10 +13,7 @@ import {
     Mail,
     Phone,
     Target,
-    BarChart3,
-    Gem,
-    Tags,
-    Briefcase,
+    BarChart3, Gem, Tags,
     AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';

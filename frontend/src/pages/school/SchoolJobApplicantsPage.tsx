@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { FiArrowLeft, FiFilter, FiUser, FiFileText, FiCheck, FiX, FiTrash2, FiClock, FiSearch } from 'react-icons/fi';
+import { FiArrowLeft, FiUser, FiFileText, FiCheck, FiX, FiTrash2, FiClock, FiSearch } from 'react-icons/fi';
 
 // Database uses snake_case
 interface ApplicantDB {

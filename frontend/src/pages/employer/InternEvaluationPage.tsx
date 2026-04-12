@@ -3,10 +3,9 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
     Search, School, User, CheckCircle, AlertCircle,
-    Star, Calendar, Briefcase, FileText, Plus, X, Trash2
+    Star, Briefcase, FileText, Plus, X, Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
 
 interface StudentWorkProgress {
     id: string;

@@ -7,6 +7,7 @@ import './index.css';
 // Auth Pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 // Common Pages - Using lazy loading
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -14,6 +15,9 @@ const JobsPage = lazy(() => import('./pages/JobsPage'));
 const JobDetailPage = lazy(() => import('./pages/JobDetailPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const JobSuggestPage = lazy(() => import('./pages/JobSuggestPage'));
 
 // New Candidate Utility Pages
 const CoursesPage = lazy(() => import('./pages/CoursesPage'));
@@ -59,7 +63,9 @@ const AdminNewsPage = lazy(() => import('./pages/admin/AdminNewsPage'));
 const AdminCoursesPage = lazy(() => import('./pages/admin/AdminCoursesPage'));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 const AdminMIQuestionsPage = lazy(() => import('./pages/admin/AdminMIQuestionsPage'));
+const AdminMBTIPage = lazy(() => import('./pages/admin/AdminMBTIPage'));
 const MITestPage = lazy(() => import('./pages/candidate/MITestPage'));
+const MBTITestPage = lazy(() => import('./pages/candidate/MBTITestPage'));
 const CandidateInterviewSchedulePage = lazy(() => import('./pages/candidate/InterviewSchedulePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
@@ -156,6 +162,23 @@ function AppRoutes() {
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route
+              path="/terms"
+              element={
+                <PrivateRoute>
+                  <TermsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/privacy"
+              element={
+                <PrivateRoute>
+                  <PrivacyPage />
+                </PrivateRoute>
+              }
+            />
 
             {/* Protected Routes */}
             <Route
@@ -208,6 +231,15 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <SettingsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/jobs/suggest"
+              element={
+                <PrivateRoute>
+                  <JobSuggestPage />
                 </PrivateRoute>
               }
             />
@@ -289,6 +321,14 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <MITestPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/candidate/mbti-test"
+              element={
+                <PrivateRoute>
+                  <MBTITestPage />
                 </PrivateRoute>
               }
             />
@@ -566,6 +606,14 @@ function AppRoutes() {
               element={
                 <PrivateRoute>
                   <AdminMIQuestionsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/mbti"
+              element={
+                <PrivateRoute>
+                  <AdminMBTIPage />
                 </PrivateRoute>
               }
             />

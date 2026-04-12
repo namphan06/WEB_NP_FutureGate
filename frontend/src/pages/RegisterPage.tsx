@@ -35,7 +35,7 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            await signUp(formData.email, formData.password, formData.fullName, formData.role);
+            await signUp(formData.email, formData.password, formData.fullName, '', formData.role);
             navigate('/');
         } catch (err: any) {
             setError(err.message || 'Đăng ký thất bại');

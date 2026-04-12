@@ -13,6 +13,24 @@ const LEVEL_COLORS: Record<CourseLevel, string> = {
     advanced: '#EF4444'
 };
 
+function CourseSkeleton() {
+    return (
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="skeleton" style={{ height: '180px', borderRadius: 0 }} />
+            <div style={{ padding: 'var(--spacing-lg)' }}>
+                <div className="skeleton" style={{ height: '0.8rem', width: '30%', marginBottom: 'var(--spacing-sm)' }} />
+                <div className="skeleton" style={{ height: '1.3rem', width: '80%', marginBottom: 'var(--spacing-sm)' }} />
+                <div className="skeleton" style={{ height: '0.9rem', width: '100%', marginBottom: 'var(--spacing-xs)' }} />
+                <div className="skeleton" style={{ height: '0.9rem', width: '60%', marginBottom: 'var(--spacing-md)' }} />
+                <div style={{ display: 'flex', gap: 'var(--spacing-md)', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--color-divider)' }}>
+                    <div className="skeleton" style={{ height: '0.85rem', width: '60px' }} />
+                    <div className="skeleton" style={{ height: '0.85rem', width: '80px' }} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function CoursesPage() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<CourseCategory[]>([]);
@@ -47,7 +65,6 @@ export default function CoursesPage() {
 
             if (error) throw error;
 
-            // Fetch lesson counts
             const coursesWithCount = await Promise.all(
                 (data || []).map(async (course) => {
                     const { count } = await supabase
@@ -83,22 +100,19 @@ export default function CoursesPage() {
 
     return (
         <div className="container section">
-            {/* Header Section */}
             <div style={{ marginBottom: 'var(--spacing-2xl)', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: 'var(--spacing-sm)' }}>
+                <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 900, marginBottom: 'var(--spacing-sm)' }}>
                     Khám phá Khoá học kỹ năng
                 </h1>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', maxWidth: '700px', margin: '0 auto' }}>
                     Nâng cao kỹ năng chuyên môn và kiến thức thực tế để tự tin chinh phục nhà tuyển dụng
                 </p>
             </div>
 
             {/* Filter Bar */}
-            <div style={{
-                background: 'white',
+            <div className="card-glass" style={{
                 padding: 'var(--spacing-lg)',
                 borderRadius: 'var(--radius-xl)',
-                boxShadow: 'var(--shadow-md)',
                 marginBottom: 'var(--spacing-xl)',
                 display: 'flex',
                 gap: 'var(--spacing-md)',
@@ -108,7 +122,7 @@ export default function CoursesPage() {
                 top: '90px',
                 zIndex: 10
             }}>
-                <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
+                <div style={{ position: 'relative', flex: '1 1 250px', minWidth: '200px' }}>
                     <FiSearch style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)' }} />
                     <input
                         type="text"
@@ -120,11 +134,11 @@ export default function CoursesPage() {
                     />
                 </div>
 
-                <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+                <div className="filter-controls" style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', flexWrap: 'wrap' }}>
                     <FiFilter color="var(--color-text-secondary)" />
                     <select
                         className="form-select"
-                        style={{ width: '180px' }}
+                        style={{ width: 'auto', minWidth: '150px', flex: '1 1 140px' }}
                         value={activeCategory}
                         onChange={(e) => setActiveCategory(e.target.value)}
                     >
@@ -136,7 +150,7 @@ export default function CoursesPage() {
 
                     <select
                         className="form-select"
-                        style={{ width: '160px' }}
+                        style={{ width: 'auto', minWidth: '140px', flex: '1 1 130px' }}
                         value={activeLevel}
                         onChange={(e) => setActiveLevel(e.target.value)}
                     >
@@ -150,8 +164,10 @@ export default function CoursesPage() {
 
             {/* Courses Grid */}
             {loading ? (
-                <div className="text-center" style={{ padding: '4rem' }}>
-                    <div className="loading">Đang tải danh sách khoá học...</div>
+                <div className="courses-grid">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <CourseSkeleton key={i} />
+                    ))}
                 </div>
             ) : filteredCourses.length === 0 ? (
                 <div className="card text-center" style={{ padding: '4rem' }}>
@@ -160,57 +176,34 @@ export default function CoursesPage() {
                     <p style={{ color: 'var(--color-text-secondary)' }}>Thử thay đổi bộ lọc hoặc từ khoá tìm kiếm của bạn.</p>
                 </div>
             ) : (
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: 'var(--spacing-xl)'
-                }}>
-                    {filteredCourses.map(course => (
+                <div className="courses-grid">
+                    {filteredCourses.map((course, index) => (
                         <Link
                             key={course.id}
                             to={`/courses/${course.id}`}
-                            className="card hover-lift"
-                            style={{
-                                padding: 0,
-                                overflow: 'hidden',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                textDecoration: 'none',
-                                color: 'inherit'
-                            }}
+                            className="course-card hover-lift animate-fade-in-up"
+                            style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'both' }}
                         >
                             {/* Course Thumbnail */}
-                            <div style={{
-                                height: '180px',
-                                position: 'relative',
+                            <div className="course-card-thumbnail" style={{
                                 background: course.thumbnail_url ? `url(${course.thumbnail_url}) center/cover` : 'var(--gradient-primary)'
                             }}>
                                 {course.is_featured && (
-                                    <div style={{
-                                        position: 'absolute', top: '12px', left: '12px',
-                                        background: 'var(--color-warning)', color: 'white',
-                                        padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700,
-                                        display: 'flex', alignItems: 'center', gap: '4px'
-                                    }}>
+                                    <div className="course-badge-featured">
                                         <FiStar size={12} /> BÁN CHẠY
                                     </div>
                                 )}
-                                <div style={{
-                                    position: 'absolute', bottom: '12px', left: '12px',
-                                    background: 'rgba(15, 23, 42, 0.8)', color: 'white',
-                                    padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600,
-                                    backdropFilter: 'blur(4px)'
-                                }}>
+                                <div className="course-category-badge">
                                     {course.category?.name || 'Kỹ năng'}
                                 </div>
                             </div>
 
                             {/* Course Info */}
-                            <div style={{ padding: 'var(--spacing-lg)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <div className="course-card-body">
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 'var(--spacing-sm)',
+                                    gap: 'var(--spacing-xs)',
                                     marginBottom: 'var(--spacing-xs)',
                                     fontSize: '0.8rem',
                                     fontWeight: 600,
@@ -219,43 +212,16 @@ export default function CoursesPage() {
                                     <FiLayers size={14} /> {COURSE_LEVELS[course.level]}
                                 </div>
 
-                                <h3 style={{
-                                    fontSize: '1.25rem',
-                                    fontWeight: 800,
-                                    marginBottom: 'var(--spacing-sm)',
-                                    lineHeight: '1.4',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden'
-                                }}>
+                                <h3 className="course-card-title">
                                     {course.title}
                                 </h3>
 
-                                <p style={{
-                                    fontSize: '0.9rem',
-                                    color: 'var(--color-text-secondary)',
-                                    marginBottom: 'var(--spacing-md)',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                    lineHeight: '1.5'
-                                }}>
+                                <p className="course-card-description">
                                     {course.description}
                                 </p>
 
-                                <div style={{
-                                    marginTop: 'auto',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    paddingTop: 'var(--spacing-md)',
-                                    borderTop: '1px solid var(--color-divider)',
-                                    fontSize: '0.85rem',
-                                    color: 'var(--color-text-secondary)'
-                                }}>
-                                    <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
+                                <div className="course-card-footer">
+                                    <div className="course-card-meta">
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                             <FiPlay size={14} /> {(course as any).lessonCount} bài
                                         </span>

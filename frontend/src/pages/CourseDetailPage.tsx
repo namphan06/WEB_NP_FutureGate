@@ -7,6 +7,39 @@ import {
     FiMessageCircle, FiUnlock
 } from 'react-icons/fi';
 
+function DetailSkeleton() {
+    return (
+        <div className="container section">
+            <div className="skeleton" style={{ height: '1rem', width: '250px', marginBottom: 'var(--spacing-xl)' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-2xl)' }}>
+                <div>
+                    <div className="skeleton" style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-xl)' }} />
+                    <div className="skeleton" style={{ height: '2rem', width: '60%', marginBottom: 'var(--spacing-sm)' }} />
+                    <div className="skeleton" style={{ height: '1rem', width: '40%', marginBottom: 'var(--spacing-xl)' }} />
+                    <div className="card">
+                        <div className="skeleton" style={{ height: '1.3rem', width: '30%', marginBottom: 'var(--spacing-md)' }} />
+                        <div className="skeleton skeleton-text" />
+                        <div className="skeleton skeleton-text" />
+                        <div className="skeleton skeleton-text" style={{ width: '70%' }} />
+                    </div>
+                </div>
+                <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div className="skeleton" style={{ height: '80px', borderRadius: 0 }} />
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} style={{ padding: 'var(--spacing-md) var(--spacing-lg)', borderBottom: '1px solid var(--color-divider)', display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center' }}>
+                            <div className="skeleton" style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0 }} />
+                            <div style={{ flex: 1 }}>
+                                <div className="skeleton" style={{ height: '0.9rem', width: '80%', marginBottom: '4px' }} />
+                                <div className="skeleton" style={{ height: '0.75rem', width: '40%' }} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function CourseDetailPage() {
     const { id } = useParams<{ id: string }>();
     const [course, setCourse] = useState<Course | null>(null);
@@ -21,7 +54,6 @@ export default function CourseDetailPage() {
     const fetchCourseDetails = async () => {
         setLoading(true);
         try {
-            // Fetch course
             const { data: courseData, error: courseError } = await supabase
                 .from('courses')
                 .select('*, category:course_categories(*)')
@@ -31,7 +63,6 @@ export default function CourseDetailPage() {
             if (courseError) throw courseError;
             setCourse(courseData);
 
-            // Fetch lessons
             const { data: lessonsData, error: lessonsError } = await supabase
                 .from('course_lessons')
                 .select('*')
@@ -41,7 +72,6 @@ export default function CourseDetailPage() {
             if (lessonsError) throw lessonsError;
             setLessons(lessonsData || []);
 
-            // Set first lesson/preview by default
             if (lessonsData && lessonsData.length > 0) {
                 setActiveLesson(lessonsData[0]);
             }
@@ -65,11 +95,7 @@ export default function CourseDetailPage() {
         return mins > 0 ? `${hours}h ${mins}p` : `${hours} giờ`;
     };
 
-    if (loading) return (
-        <div className="container section text-center">
-            <div className="loading">Đang tải nội dung khoá học...</div>
-        </div>
-    );
+    if (loading) return <DetailSkeleton />;
 
     if (!course) return (
         <div className="container section text-center">
@@ -82,27 +108,18 @@ export default function CourseDetailPage() {
 
     return (
         <div className="container section">
-            <Link to="/courses" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: 'var(--spacing-xl)', fontWeight: 600 }}>
+            <Link to="/courses" className="back-link" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)', textDecoration: 'none', marginBottom: 'var(--spacing-xl)', fontWeight: 600 }}>
                 <FiArrowLeft /> Quay lại danh sách khoá học
             </Link>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: 'var(--spacing-2xl)' }}>
+            <div className="course-detail-grid">
                 {/* Main Content: Video & Info */}
-                <div>
-                    {/* Video Player Area */}
-                    <div style={{
-                        background: '#000',
-                        aspectRatio: '16/9',
-                        borderRadius: 'var(--radius-xl)',
-                        overflow: 'hidden',
-                        boxShadow: 'var(--shadow-lg)',
-                        marginBottom: 'var(--spacing-xl)',
-                        position: 'relative'
-                    }}>
+                <div className="course-detail-main">
+                    {/* Video Player Area - 16:9 responsive */}
+                    <div className="video-wrapper">
                         {videoId ? (
                             <iframe
-                                width="100%"
-                                height="100%"
+                                className="video-iframe"
                                 src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`}
                                 title={activeLesson?.title}
                                 frameBorder="0"
@@ -110,19 +127,19 @@ export default function CourseDetailPage() {
                                 allowFullScreen
                             ></iframe>
                         ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                            <div className="video-placeholder">
                                 <FiPlay size={60} style={{ opacity: 0.5 }} />
                                 <p>Chọn bài học để bắt đầu xem</p>
                             </div>
                         )}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-lg)' }}>
+                    <div className="course-detail-header">
                         <div>
-                            <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: 'var(--spacing-sm)' }}>
+                            <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 900, marginBottom: 'var(--spacing-sm)' }}>
                                 {activeLesson?.title || course.title}
                             </h1>
-                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', fontSize: '0.95rem', color: 'var(--color-text-secondary)' }}>
+                            <div className="course-detail-meta">
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <FiBook size={16} /> {course.category?.name}
                                 </span>
@@ -136,13 +153,13 @@ export default function CourseDetailPage() {
                         </div>
                     </div>
 
-                    <div className="card" style={{ marginBottom: 'var(--spacing-xl)' }}>
+                    <div className="card course-description-card">
                         <h3 style={{ marginBottom: 'var(--spacing-md)' }}>Mô tả khoá học</h3>
-                        <p style={{ lineHeight: 1.7, color: 'var(--color-text-secondary)', whiteSpace: 'pre-line' }}>
+                        <p className="course-description-text">
                             {course.description}
                         </p>
                         {activeLesson?.description && (
-                            <div style={{ marginTop: 'var(--spacing-lg)', paddingTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-divider)' }}>
+                            <div className="lesson-detail-section">
                                 <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Chi tiết bài học</h4>
                                 <p style={{ lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>{activeLesson.description}</p>
                             </div>
@@ -151,7 +168,7 @@ export default function CourseDetailPage() {
 
                     {/* Tags */}
                     {course.tags && course.tags.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-xs)', marginBottom: 'var(--spacing-xl)' }}>
+                        <div className="course-tags">
                             {course.tags.map(tag => (
                                 <span key={tag} className="badge badge-outline">#{tag}</span>
                             ))}
@@ -160,57 +177,29 @@ export default function CourseDetailPage() {
                 </div>
 
                 {/* Sidebar: Lesson List */}
-                <div style={{ position: 'sticky', top: '90px', height: 'fit-content' }}>
-                    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                        <div style={{ padding: 'var(--spacing-lg)', borderBottom: '1px solid var(--color-divider)', background: 'var(--color-background-light)' }}>
+                <aside className="course-detail-sidebar">
+                    <div className="card lesson-list-card">
+                        <div className="lesson-list-header">
                             <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Nội dung bài học</h3>
                             <p style={{ margin: 'var(--spacing-xs) 0 0 0', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                                 {lessons.length} bài học • {formatDuration(course.duration_minutes)}
                             </p>
                         </div>
-                        <div style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+                        <div className="lesson-list-scroll">
                             {lessons.map((lesson, idx) => (
                                 <div
                                     key={lesson.id}
                                     onClick={() => setActiveLesson(lesson)}
-                                    style={{
-                                        padding: 'var(--spacing-md) var(--spacing-lg)',
-                                        borderBottom: '1px solid var(--color-divider)',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s',
-                                        background: activeLesson?.id === lesson.id ? 'var(--color-primary-light)' : 'transparent',
-                                        borderLeft: `4px solid ${activeLesson?.id === lesson.id ? 'var(--color-primary)' : 'transparent'}`,
-                                        display: 'flex',
-                                        gap: 'var(--spacing-md)',
-                                        alignItems: 'center'
-                                    }}
-                                    className="hover-bg-light"
+                                    className={`lesson-item ${activeLesson?.id === lesson.id ? 'lesson-item-active' : ''}`}
                                 >
-                                    <div style={{
-                                        width: '28px',
-                                        height: '28px',
-                                        borderRadius: '50%',
-                                        background: activeLesson?.id === lesson.id ? 'var(--color-primary)' : 'var(--color-background)',
-                                        color: activeLesson?.id === lesson.id ? 'white' : 'var(--color-text-secondary)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '0.8rem',
-                                        fontWeight: 700,
-                                        flexShrink: 0
-                                    }}>
+                                    <div className={`lesson-number ${activeLesson?.id === lesson.id ? 'lesson-number-active' : ''}`}>
                                         {idx + 1}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{
-                                            fontSize: '0.9375rem',
-                                            fontWeight: activeLesson?.id === lesson.id ? 700 : 500,
-                                            lineHeight: 1.4,
-                                            marginBottom: '2px'
-                                        }}>
+                                        <div className={`lesson-title ${activeLesson?.id === lesson.id ? 'lesson-title-active' : ''}`}>
                                             {lesson.title}
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
+                                        <div className="lesson-duration">
                                             <FiPlay size={12} /> {lesson.duration_minutes} phút
                                         </div>
                                     </div>
@@ -219,14 +208,14 @@ export default function CourseDetailPage() {
                         </div>
                     </div>
 
-                    <div className="card" style={{ marginTop: 'var(--spacing-lg)', background: 'var(--gradient-primary)', color: 'white' }}>
+                    <div className="card course-support-card">
                         <h4 style={{ margin: 0, marginBottom: 'var(--spacing-xs)' }}>Hỗ trợ học tập</h4>
                         <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', marginBottom: 'var(--spacing-md)' }}>Tham gia cộng đồng học viên để cùng thảo luận và giải đáp thắc mắc.</p>
-                        <button className="btn" style={{ background: 'white', color: 'var(--color-primary)', width: '100%', fontWeight: 700 }}>
+                        <button className="btn btn-support-join">
                             <FiMessageCircle /> Tham gia nhóm
                         </button>
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
     );

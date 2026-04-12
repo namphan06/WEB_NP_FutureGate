@@ -1,37 +1,374 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Job } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import {
     FiMapPin, FiDollarSign, FiBriefcase, FiClock, FiCheckCircle,
     FiBookmark, FiShare2, FiHome, FiChevronRight, FiCalendar,
-    FiUsers, FiAward, FiMessageSquare
+    FiUsers, FiAward, FiMessageSquare, FiFileText, FiPlus, FiX
 } from 'react-icons/fi';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { ChatService } from '../lib/chatService';
 
+function JobDetailSkeleton() {
+    return (
+        <div style={{ background: 'var(--color-background)', minHeight: '100vh', paddingTop: 'var(--spacing-lg)' }}>
+            <div className="container">
+                {/* Breadcrumb skeleton */}
+                <div className="job-detail-breadcrumb" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                    <div className="skeleton" style={{ width: '80px', height: '16px' }}></div>
+                    <FiChevronRight size={14} style={{ color: 'var(--color-text-muted)' }} />
+                    <div className="skeleton" style={{ width: '100px', height: '16px' }}></div>
+                    <FiChevronRight size={14} style={{ color: 'var(--color-text-muted)' }} />
+                    <div className="skeleton" style={{ width: '150px', height: '16px' }}></div>
+                </div>
+
+                <div className="job-detail-grid">
+                    {/* Main Content Skeleton */}
+                    <div>
+                        {/* Header Card Skeleton */}
+                        <div className="card" style={{ marginBottom: 'var(--spacing-xl)' }}>
+                            <div className="skeleton-job-header">
+                                <div className="skeleton job-detail-logo" style={{
+                                    width: '120px',
+                                    height: '120px',
+                                    borderRadius: 'var(--radius-lg)',
+                                    flexShrink: 0
+                                }}></div>
+                                <div className="skeleton-job-main">
+                                    <div className="skeleton" style={{ width: '70%', height: '2rem', marginBottom: 'var(--spacing-md)' }}></div>
+                                    <div className="skeleton skeleton-line-short" style={{ marginBottom: 'var(--spacing-lg)' }}></div>
+                                    <div style={{ display: 'flex', gap: 'var(--spacing-xl)', flexWrap: 'wrap', marginBottom: 'var(--spacing-lg)' }}>
+                                        <div className="skeleton" style={{ width: '120px', height: '40px' }}></div>
+                                        <div className="skeleton" style={{ width: '120px', height: '40px' }}></div>
+                                        <div className="skeleton" style={{ width: '120px', height: '40px' }}></div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap' }}>
+                                        <div className="skeleton" style={{ width: '160px', height: '48px' }}></div>
+                                        <div className="skeleton" style={{ width: '120px', height: '48px' }}></div>
+                                        <div className="skeleton" style={{ width: '100px', height: '48px' }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="skeleton" style={{ marginTop: 'var(--spacing-lg)', height: '50px' }}></div>
+                        </div>
+
+                        {/* Job Details Skeleton */}
+                        <div className="card">
+                            <div className="skeleton" style={{ width: '40%', height: '1.5rem', marginBottom: 'var(--spacing-lg)' }}></div>
+                            <div className="job-detail-meta-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i}>
+                                        <div className="skeleton" style={{ width: '60%', height: '14px', marginBottom: '0.5rem' }}></div>
+                                        <div className="skeleton" style={{ width: '40%', height: '18px' }}></div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                <div className="skeleton" style={{ width: '30%', height: '1.5rem', marginBottom: 'var(--spacing-md)' }}></div>
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="skeleton skeleton-line" style={{ marginBottom: 'var(--spacing-sm)', width: `${85 - i * 10}%` }}></div>
+                                ))}
+                            </div>
+
+                            <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                <div className="skeleton" style={{ width: '30%', height: '1.5rem', marginBottom: 'var(--spacing-md)' }}></div>
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="skeleton skeleton-line" style={{ marginBottom: 'var(--spacing-sm)', width: `${90 - i * 15}%` }}></div>
+                                ))}
+                            </div>
+
+                            <div>
+                                <div className="skeleton" style={{ width: '20%', height: '1.5rem', marginBottom: 'var(--spacing-md)' }}></div>
+                                <div className="job-detail-benefits-grid">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div key={i} className="skeleton" style={{ height: '40px' }}></div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar Skeleton */}
+                    <div>
+                        <div className="card job-detail-sidebar-card" style={{ position: 'sticky', top: 'calc(var(--header-height) + var(--spacing-lg))' }}>
+                            <div className="skeleton" style={{ width: '50%', height: '1.25rem', marginBottom: 'var(--spacing-lg)' }}></div>
+                            <div style={{ textAlign: 'center', paddingBottom: 'var(--spacing-lg)', borderBottom: '1px solid var(--color-divider)', marginBottom: 'var(--spacing-lg)' }}>
+                                <div className="skeleton job-detail-sidebar-logo" style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    borderRadius: 'var(--radius-lg)',
+                                    margin: '0 auto var(--spacing-md)'
+                                }}></div>
+                                <div className="skeleton" style={{ width: '60%', height: '1.125rem', margin: '0 auto 0.5rem' }}></div>
+                                <div className="skeleton" style={{ width: '40%', height: '0.875rem', margin: '0 auto' }}></div>
+                            </div>
+                            <div className="skeleton" style={{ height: '40px', marginBottom: 'var(--spacing-lg)' }}></div>
+                            <div className="skeleton" style={{ width: '100%', height: '44px' }}></div>
+                            <div style={{ marginTop: 'var(--spacing-lg)', paddingTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-divider)' }}>
+                                <div className="skeleton" style={{ width: '50%', height: '14px', marginBottom: 'var(--spacing-sm)' }}></div>
+                                <div className="skeleton" style={{ width: '30%', height: '14px' }}></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CVSelectionModal({
+    userCVs,
+    selectedCVId,
+    onSelectCV,
+    onApply,
+    onClose,
+    applying
+}: {
+    userCVs: any[];
+    selectedCVId: string;
+    onSelectCV: (id: string) => void;
+    onApply: () => void;
+    onClose: () => void;
+    applying: boolean;
+}) {
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 'var(--z-modal)',
+                padding: 'var(--spacing-lg)',
+                animation: 'fade-in 0.2s ease-out'
+            }}
+            onClick={onClose}
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                    background: 'var(--glass-bg-dark)',
+                    backdropFilter: 'var(--glass-blur)',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: 'var(--radius-xl)',
+                    boxShadow: 'var(--glass-shadow)',
+                    maxWidth: '560px',
+                    width: '100%',
+                    maxHeight: '80vh',
+                    overflow: 'auto',
+                    animation: 'scale-in 0.3s ease-out'
+                }}
+            >
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: 'var(--spacing-lg) var(--spacing-lg) var(--spacing-md)',
+                    borderBottom: '1px solid var(--color-divider)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                        <FiFileText size={22} style={{ color: 'var(--color-primary)' }} />
+                        <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Chọn CV để ứng tuyển</h3>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-secondary)',
+                            padding: 'var(--spacing-xs)',
+                            borderRadius: 'var(--radius-sm)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all var(--transition-fast)'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--color-primary-50)';
+                            e.currentTarget.style.color = 'var(--color-primary)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'none';
+                            e.currentTarget.style.color = 'var(--color-text-secondary)';
+                        }}
+                    >
+                        <FiX size={20} />
+                    </button>
+                </div>
+
+                <div style={{ padding: 'var(--spacing-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    {userCVs.map((cv) => (
+                        <div
+                            key={cv.id}
+                            onClick={() => onSelectCV(cv.id)}
+                            style={{
+                                padding: 'var(--spacing-md)',
+                                borderRadius: 'var(--radius-md)',
+                                border: selectedCVId === cv.id
+                                    ? '2px solid var(--color-primary)'
+                                    : '2px solid var(--color-border)',
+                                background: selectedCVId === cv.id
+                                    ? 'rgba(30, 136, 229, 0.05)'
+                                    : 'var(--color-surface)',
+                                cursor: 'pointer',
+                                transition: 'all var(--transition-base)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 'var(--spacing-md)'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (selectedCVId !== cv.id) {
+                                    e.currentTarget.style.borderColor = 'var(--color-primary-light)';
+                                    e.currentTarget.style.background = 'var(--color-primary-50)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (selectedCVId !== cv.id) {
+                                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                                    e.currentTarget.style.background = 'var(--color-surface)';
+                                }
+                            }}
+                        >
+                            <div style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                border: selectedCVId === cv.id
+                                    ? '2px solid var(--color-primary)'
+                                    : '2px solid var(--color-border)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                transition: 'all var(--transition-fast)'
+                            }}>
+                                {selectedCVId === cv.id && (
+                                    <div style={{
+                                        width: '10px',
+                                        height: '10px',
+                                        borderRadius: '50%',
+                                        background: 'var(--color-primary)'
+                                    }} />
+                                )}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                    fontWeight: 600,
+                                    fontSize: '0.9375rem',
+                                    marginBottom: '0.25rem',
+                                    color: selectedCVId === cv.id ? 'var(--color-primary)' : 'var(--color-text)'
+                                }}>
+                                    {cv.title || 'CV không tiêu đề'}
+                                </div>
+                                <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+                                    Cập nhật: {new Date(cv.updated_at).toLocaleDateString('vi-VN')}
+                                </div>
+                            </div>
+                            <FiFileText
+                                size={20}
+                                style={{
+                                    color: selectedCVId === cv.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                                    flexShrink: 0
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{
+                    padding: 'var(--spacing-md) var(--spacing-lg) var(--spacing-lg)',
+                    borderTop: '1px solid var(--color-divider)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--spacing-sm)'
+                }}>
+                    <button
+                        onClick={onApply}
+                        disabled={!selectedCVId || applying}
+                        className="btn btn-primary btn-lg"
+                        style={{ width: '100%' }}
+                    >
+                        {applying ? 'Đang xử lý...' : (
+                            <>
+                                <FiCheckCircle size={20} />
+                                Ứng tuyển với CV đã chọn
+                            </>
+                        )}
+                    </button>
+                    <Link
+                        to="/cv-builder"
+                        onClick={onClose}
+                        style={{
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 'var(--spacing-xs)',
+                            padding: 'var(--spacing-sm)',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            color: 'var(--color-primary)',
+                            textDecoration: 'none',
+                            transition: 'all var(--transition-fast)'
+                        }}
+                    >
+                        <FiPlus size={16} />
+                        Tạo CV mới
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
     const [job, setJob] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [applying, setApplying] = useState(false);
     const [saved, setSaved] = useState(false);
     const [success, setSuccess] = useState(false);
     const [applicationInfo, setApplicationInfo] = useState<any>(null);
+    const [userCVs, setUserCVs] = useState<any[]>([]);
+    const [showCVModal, setShowCVModal] = useState(false);
+    const [selectedCVId, setSelectedCVId] = useState<string>('');
 
     useEffect(() => {
         if (id) fetchJob();
-        if (id && user) checkApplication();
+        if (id && user) {
+            checkApplication();
+            fetchUserCVs();
+        }
     }, [id, user]);
+
+    const fetchUserCVs = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('cv_templates')
+                .select('id, title, updated_at')
+                .eq('user_id', user?.id)
+                .order('updated_at', { ascending: false });
+
+            if (error) throw error;
+            setUserCVs(data || []);
+        } catch (error) {
+            console.error('Error fetching user CVs:', error);
+            setUserCVs([]);
+        }
+    };
 
     const checkApplication = async () => {
         try {
-            // Check activities first
             const { data: activities, error } = await supabase
                 .from('user_job_activities')
                 .select('*')
@@ -40,13 +377,11 @@ export default function JobDetailPage() {
 
             if (error) throw error;
 
-            // Find application activity
             const appAct = activities?.find(a =>
                 a.activity_type === 'applied' || a.activity === 'applied' || a.is_applied === true
             );
 
             if (appAct) {
-                // Fetch CV name
                 let cvTitle = 'CV Mặc định';
                 if (appAct.cv_id && appAct.cv_id !== '00000000-0000-0000-0000-000000000000') {
                     const { data: cvData } = await supabase
@@ -64,7 +399,6 @@ export default function JobDetailPage() {
                 setSuccess(true);
             }
 
-            // Also check saved status
             const savedAct = activities?.find(a =>
                 a.activity_type === 'saved' || a.activity === 'saved' || a.is_saved === true
             );
@@ -78,7 +412,6 @@ export default function JobDetailPage() {
     const fetchJob = async () => {
         try {
             setLoading(true);
-            // Fetch job first
             const { data: jobData, error: jobError } = await supabase
                 .from('jobs')
                 .select('*')
@@ -88,7 +421,6 @@ export default function JobDetailPage() {
             if (jobError) throw jobError;
 
             if (jobData) {
-                // Fetch employer profile
                 const { data: employerData, error: employerError } = await supabase
                     .from('profiles')
                     .select('id, full_name, company_name, avatar_url, email, phone, metadata, role')
@@ -99,13 +431,11 @@ export default function JobDetailPage() {
                     console.warn('Error fetching employer:', employerError);
                 }
 
-                // Merge data
                 setJob({
                     ...jobData,
                     profiles: employerData
                 } as any);
 
-                // Increment view count
                 await supabase
                     .from('jobs')
                     .update({ view_count: (jobData.view_count || 0) + 1 })
@@ -118,7 +448,7 @@ export default function JobDetailPage() {
         }
     };
 
-    const handleApply = async () => {
+    const submitApplication = async (cvId: string) => {
         if (!user || !id) return;
 
         try {
@@ -126,11 +456,12 @@ export default function JobDetailPage() {
             const { error } = await supabase.rpc('apply_to_job', {
                 p_job_id: id,
                 p_user_id: user.id,
-                p_cv_id: '00000000-0000-0000-0000-000000000000' // Placeholder
+                p_cv_id: cvId
             });
 
             if (error) throw error;
             setSuccess(true);
+            setShowCVModal(false);
             setTimeout(() => setSuccess(false), 3000);
         } catch (error: any) {
             alert(error.message || 'Ứng tuyển thất bại');
@@ -139,9 +470,58 @@ export default function JobDetailPage() {
         }
     };
 
-    const handleSave = () => {
-        setSaved(!saved);
-        // TODO: Implement save to database
+    const handleApply = async () => {
+        if (!user || !id) return;
+
+        if (userCVs.length === 0) {
+            alert('Bạn chưa có CV nào. Vui lòng tạo CV trước khi ứng tuyển.');
+            return;
+        }
+
+        if (userCVs.length === 1) {
+            setSelectedCVId(userCVs[0].id);
+            await submitApplication(userCVs[0].id);
+            return;
+        }
+
+        setShowCVModal(true);
+    };
+
+    const handleCVSelectAndApply = async () => {
+        if (!selectedCVId) return;
+        await submitApplication(selectedCVId);
+    };
+
+    const handleSave = async () => {
+        if (!user || !id) return;
+
+        try {
+            if (saved) {
+                const { error } = await supabase
+                    .from('user_job_activities')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .eq('job_id', id)
+                    .eq('activity_type', 'saved');
+
+                if (error) throw error;
+                setSaved(false);
+            } else {
+                const { error } = await supabase
+                    .from('user_job_activities')
+                    .insert({
+                        user_id: user.id,
+                        job_id: id,
+                        activity_type: 'saved'
+                    });
+
+                if (error) throw error;
+                setSaved(true);
+            }
+        } catch (error: any) {
+            console.error('Error saving job:', error);
+            alert(error.message || 'Có lỗi xảy ra khi lưu công việc');
+        }
     };
 
     const handleChat = async () => {
@@ -193,11 +573,7 @@ export default function JobDetailPage() {
     };
 
     if (loading) {
-        return (
-            <div className="container section">
-                <div className="loading text-center">Đang tải...</div>
-            </div>
-        );
+        return <JobDetailSkeleton />;
     }
 
     if (!job) {
@@ -217,14 +593,7 @@ export default function JobDetailPage() {
         <div style={{ background: 'var(--color-background)', minHeight: '100vh', paddingTop: 'var(--spacing-lg)' }}>
             <div className="container">
                 {/* Breadcrumb */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--spacing-sm)',
-                    marginBottom: 'var(--spacing-lg)',
-                    fontSize: '0.875rem',
-                    color: 'var(--color-text-secondary)'
-                }}>
+                <div className="job-detail-breadcrumb" style={{ marginBottom: 'var(--spacing-lg)', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <FiHome size={16} />
                         Trang chủ
@@ -235,14 +604,14 @@ export default function JobDetailPage() {
                     <span style={{ color: 'var(--color-text)' }}>{job.metadata.title}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 'var(--spacing-2xl)' }}>
+                <div className="job-detail-grid">
                     {/* Main Content */}
                     <div>
                         {/* Header Card */}
                         <div className="card animate-fade-in" style={{ marginBottom: 'var(--spacing-xl)' }}>
-                            <div style={{ display: 'flex', gap: 'var(--spacing-xl)', alignItems: 'start' }}>
+                            <div className="job-detail-header-content">
                                 {/* Company Logo */}
-                                <div style={{
+                                <div className="job-detail-logo" style={{
                                     width: '120px',
                                     height: '120px',
                                     borderRadius: 'var(--radius-lg)',
@@ -288,7 +657,7 @@ export default function JobDetailPage() {
                                     </p>
 
                                     {/* Quick Info */}
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-xl)', marginBottom: 'var(--spacing-lg)' }}>
+                                    <div className="job-detail-quick-info" style={{ marginBottom: 'var(--spacing-lg)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                             <FiDollarSign size={20} style={{ color: 'var(--color-secondary)' }} />
                                             <div>
@@ -321,7 +690,7 @@ export default function JobDetailPage() {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
+                                    <div className="job-detail-actions">
                                         {user?.id === job.creator_id ? (
                                             <Link
                                                 to={job.profiles?.role === 'school' ? `/school/jobs/${job.id}/applicants` : `/employer/jobs/${job.id}/applicants`}
@@ -381,7 +750,8 @@ export default function JobDetailPage() {
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: 'var(--spacing-md)',
-                                                    flex: 1
+                                                    flex: 1,
+                                                    minWidth: 0
                                                 }}>
                                                     <div style={{
                                                         width: '40px',
@@ -391,11 +761,12 @@ export default function JobDetailPage() {
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        color: 'white'
+                                                        color: 'white',
+                                                        flexShrink: 0
                                                     }}>
                                                         <FiCheckCircle size={24} />
                                                     </div>
-                                                    <div>
+                                                    <div style={{ minWidth: 0 }}>
                                                         <div style={{ fontWeight: 700, color: 'var(--color-success-dark)', fontSize: '1.1rem' }}>
                                                             Bạn đã ứng tuyển công việc này
                                                         </div>
@@ -430,16 +801,12 @@ export default function JobDetailPage() {
                             </div>
 
                             {/* Deadline or Application Status Warning */}
-                            <div style={{
+                            <div className="job-detail-status-bar" style={{
                                 marginTop: 'var(--spacing-lg)',
                                 padding: 'var(--spacing-md)',
                                 background: applicationInfo ? 'rgba(30, 136, 229, 0.05)' : 'rgba(255, 193, 7, 0.1)',
                                 borderLeft: `4px solid ${applicationInfo ? 'var(--color-primary)' : 'var(--color-warning)'}`,
-                                borderRadius: 'var(--radius-sm)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                gap: 'var(--spacing-sm)'
+                                borderRadius: 'var(--radius-sm)'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                                     {applicationInfo ? <FiClock size={18} style={{ color: 'var(--color-primary)' }} /> : <FiCalendar size={18} style={{ color: 'var(--color-warning)' }} />}
@@ -463,7 +830,7 @@ export default function JobDetailPage() {
                             {/* Chi tiết tin tuyển dụng */}
                             <h3 style={{ marginBottom: 'var(--spacing-lg)' }}>Chi tiết tin tuyển dụng</h3>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-2xl)' }}>
+                            <div className="job-detail-meta-grid" style={{ marginBottom: 'var(--spacing-2xl)' }}>
                                 <div>
                                     <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '0.25rem' }}>
                                         Số lượng tuyển
@@ -539,7 +906,7 @@ export default function JobDetailPage() {
                             {/* Quyền lợi */}
                             <div>
                                 <h3 style={{ marginBottom: 'var(--spacing-md)' }}>Quyền lợi</h3>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--spacing-md)' }}>
+                                <div className="job-detail-benefits-grid">
                                     {Array.isArray(job.metadata.benefits) && job.metadata.benefits.map((benefit: string, index: number) => (
                                         <div key={index} style={{
                                             display: 'flex',
@@ -561,7 +928,7 @@ export default function JobDetailPage() {
                     {/* Sidebar */}
                     <div>
                         {/* Company Info Card */}
-                        <div className="card animate-slide-in" style={{ position: 'sticky', top: 'calc(var(--header-height) + var(--spacing-lg))' }}>
+                        <div className="card job-detail-sidebar-card animate-slide-in" style={{ position: 'sticky', top: 'calc(var(--header-height) + var(--spacing-lg))' }}>
                             <h4 style={{ marginBottom: 'var(--spacing-lg)' }}>Thông tin công ty</h4>
 
                             <div style={{
@@ -570,7 +937,7 @@ export default function JobDetailPage() {
                                 borderBottom: '1px solid var(--color-divider)',
                                 marginBottom: 'var(--spacing-lg)'
                             }}>
-                                <div style={{
+                                <div className="job-detail-sidebar-logo" style={{
                                     width: '80px',
                                     height: '80px',
                                     borderRadius: 'var(--radius-lg)',
@@ -648,6 +1015,17 @@ export default function JobDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {showCVModal && (
+                <CVSelectionModal
+                    userCVs={userCVs}
+                    selectedCVId={selectedCVId}
+                    onSelectCV={setSelectedCVId}
+                    onApply={handleCVSelectAndApply}
+                    onClose={() => setShowCVModal(false)}
+                    applying={applying}
+                />
+            )}
         </div>
     );
 }

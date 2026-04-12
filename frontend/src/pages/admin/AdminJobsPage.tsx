@@ -22,7 +22,7 @@ interface Job {
     employer?: any;
     school?: any;
     type: 'regular' | 'partnership';
-    metadata?: any; // Include metadata object for accessing additional fields
+    metadata?: any;
 }
 
 export default function AdminJobsPage() {
@@ -34,9 +34,8 @@ export default function AdminJobsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
-    const [actionLoading, setActionLoading] = useState(false); // Using this for buttons below
+    const [actionLoading, setActionLoading] = useState(false);
 
-    // Only admins can access
     if (profile?.role !== 'admin') {
         return <Navigate to="/" />;
     }
@@ -91,7 +90,6 @@ export default function AdminJobsPage() {
                             employer: employerRes.data,
                             type: 'partnership' as const,
                             status: job.admin_status,
-                            // Partnership jobs also have metadata structure
                             title: job.metadata?.title || job.title || 'Untitled',
                             location: job.metadata?.work_locations?.[0] || job.metadata?.working_regions?.[0] || job.location || 'N/A',
                             salary_min: job.metadata?.salary?.min || job.salary_min,
@@ -155,7 +153,6 @@ export default function AdminJobsPage() {
 
     const formatSalary = (min?: number, max?: number) => {
         if (!min && !max) return 'Thỏa thuận';
-        // Salary values are already in millions (e.g., 5 = 5 triệu VNĐ)
         if (min && max) return `${min.toFixed(0)} - ${max.toFixed(0)} triệu VNĐ`;
         if (min) return `Từ ${min.toFixed(0)} triệu VNĐ`;
         if (max) return `Đến ${max.toFixed(0)} triệu VNĐ`;
@@ -163,60 +160,46 @@ export default function AdminJobsPage() {
     };
 
     return (
-        <div style={{ background: '#F8FAFC', minHeight: '100vh', padding: '2.5rem 50px' }}>
-            {/* Header Section */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+        <div className="admin-jobs-page" style={{ padding: 'var(--spacing-2xl)', minHeight: '100vh', background: 'var(--color-background-alt)' }}>
+            <div className="admin-header">
                 <div>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1E293B', marginBottom: '0.5rem' }}>Duyệt tin tuyển dụng</h1>
-                    <p style={{ color: '#64748B', fontSize: '1.1rem', margin: 0 }}>Xác thực và phân phối nhu cầu tuyển dụng đến người dùng</p>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 900, color: 'var(--color-text)', marginBottom: 'var(--spacing-sm)' }}>Duyệt tin tuyển dụng</h1>
+                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem', margin: 0 }}>Xác thực và phân phối nhu cầu tuyển dụng đến người dùng</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', background: '#E2E8F0', padding: '0.5rem', borderRadius: '20px' }}>
+                <div className="admin-tab-switcher">
                     <button
                         onClick={() => setActiveTab('regular')}
-                        style={{
-                            padding: '0.75rem 1.5rem', borderRadius: '16px', border: 'none', fontWeight: 700, cursor: 'pointer',
-                            background: activeTab === 'regular' ? 'white' : 'transparent',
-                            color: activeTab === 'regular' ? 'var(--color-primary)' : '#64748B',
-                            boxShadow: activeTab === 'regular' ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none',
-                            transition: 'all 0.2s'
-                        }}
+                        className={activeTab === 'regular' ? 'active' : ''}
                     >
                         Việc thông thường
                     </button>
                     <button
                         onClick={() => setActiveTab('partnership')}
-                        style={{
-                            padding: '0.75rem 1.5rem', borderRadius: '16px', border: 'none', fontWeight: 700, cursor: 'pointer',
-                            background: activeTab === 'partnership' ? 'white' : 'transparent',
-                            color: activeTab === 'partnership' ? 'var(--color-primary)' : '#64748B',
-                            boxShadow: activeTab === 'partnership' ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none',
-                            transition: 'all 0.2s'
-                        }}
+                        className={activeTab === 'partnership' ? 'active' : ''}
                     >
                         Việc liên kết
                     </button>
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="card" style={{ padding: '1.5rem', borderRadius: '24px', border: '1px solid #E2E8F0', marginBottom: '2.5rem', background: 'white' }}>
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', flex: 1 }}>
-                        <Search size={18} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+            <div className="card animate-fade-in-up" style={{ padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)', marginBottom: 'var(--spacing-2xl)', animationDelay: '100ms', animationFillMode: 'both' }}>
+                <div className="admin-filter-controls">
+                    <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+                        <Search size={18} style={{ position: 'absolute', left: 'var(--spacing-lg)', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
                         <input
                             type="text"
                             className="form-input"
                             placeholder="Tìm theo tiêu đề, công ty..."
-                            style={{ paddingLeft: '3rem', height: '54px', borderRadius: '16px' }}
+                            style={{ paddingLeft: '3rem', height: '54px', borderRadius: 'var(--radius-lg)' }}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div style={{ width: '220px', position: 'relative' }}>
-                        <Filter size={18} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                    <div style={{ width: '220px', position: 'relative', minWidth: '180px' }}>
+                        <Filter size={18} style={{ position: 'absolute', left: 'var(--spacing-lg)', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
                         <select
                             className="form-select"
-                            style={{ paddingLeft: '3rem', height: '54px', borderRadius: '16px', fontWeight: 600 }}
+                            style={{ paddingLeft: '3rem', height: '54px', borderRadius: 'var(--radius-lg)', fontWeight: 600 }}
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value as any)}
                         >
@@ -229,79 +212,103 @@ export default function AdminJobsPage() {
                 </div>
             </div>
 
-            {/* Jobs Grid */}
             {loading ? (
-                <div style={{ textAlign: 'center', padding: '5rem' }}>
-                    <div className="loading">Đang tải danh sách tin tuyển dụng...</div>
+                <div className="admin-jobs-grid">
+                    {[0, 1, 2, 3, 4, 5].map(idx => (
+                        <div key={idx} className="card animate-fade-in-up" style={{ padding: 'var(--spacing-xl)', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)', animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}>
+                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
+                                <div className="skeleton" style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-lg)', flexShrink: 0 }} />
+                                <div style={{ flex: 1 }}>
+                                    <div className="skeleton" style={{ height: '20px', width: '60px', marginBottom: 'var(--spacing-xs)', borderRadius: 'var(--radius-sm)' }} />
+                                    <div className="skeleton" style={{ height: '24px', width: '80%', borderRadius: 'var(--radius-sm)' }} />
+                                </div>
+                            </div>
+                            <div className="skeleton" style={{ height: '64px', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-lg)' }} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+                                {[0, 1, 2, 3].map(i => (
+                                    <div key={i} className="skeleton" style={{ height: '24px', borderRadius: 'var(--radius-sm)' }} />
+                                ))}
+                            </div>
+                            <div className="skeleton" style={{ height: '48px', borderRadius: 'var(--radius-md)' }} />
+                        </div>
+                    ))}
                 </div>
             ) : filteredJobs.length === 0 ? (
-                <div className="card" style={{ textAlign: 'center', padding: '5rem', borderRadius: '24px', border: '1px solid #E2E8F0' }}>
-                    <Briefcase size={60} style={{ color: '#E2E8F0', marginBottom: '1.5rem' }} />
-                    <h3 style={{ color: '#1E293B', marginBottom: '0.5rem' }}>Không tìm thấy tin nào</h3>
-                    <p style={{ color: '#64748B' }}>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
+                <div className="card" style={{ textAlign: 'center', padding: 'var(--spacing-4xl)', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--color-border)' }}>
+                    <Briefcase size={60} style={{ color: 'var(--color-border)', marginBottom: 'var(--spacing-lg)', margin: '0 auto var(--spacing-lg)' }} />
+                    <h3 style={{ color: 'var(--color-text)', marginBottom: 'var(--spacing-sm)' }}>Không tìm thấy tin nào</h3>
+                    <p style={{ color: 'var(--color-text-secondary)' }}>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm của bạn.</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))', gap: '1.5rem' }}>
-                    {filteredJobs.map(job => (
+                <div className="admin-jobs-grid">
+                    {filteredJobs.map((job, idx) => (
                         <div
                             key={job.id}
                             onClick={() => { setSelectedJob(job); setShowDetailModal(true); }}
-                            className="card hover-lift"
-                            style={{ padding: '2rem', borderRadius: '28px', border: '1px solid #E2E8F0', background: 'white', cursor: 'pointer', position: 'relative' }}
+                            className="card hover-lift animate-fade-in-up"
+                            style={{
+                                padding: 'var(--spacing-xl)',
+                                borderRadius: 'var(--radius-2xl)',
+                                border: '1px solid var(--color-border)',
+                                cursor: 'pointer',
+                                position: 'relative',
+                                animationDelay: `${idx * 60}ms`,
+                                animationFillMode: 'both'
+                            }}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                    <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: activeTab === 'regular' ? '#3B82F6' : '#8B5CF6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-lg)', gap: 'var(--spacing-md)' }}>
+                                <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center', minWidth: 0 }}>
+                                    <div style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-lg)', background: activeTab === 'regular' ? '#3B82F6' : '#8B5CF6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                         {activeTab === 'regular' ? <Briefcase size={24} /> : <LinkIcon size={24} />}
                                     </div>
-                                    <div>
+                                    <div style={{ minWidth: 0 }}>
                                         <div style={{
-                                            padding: '4px 10px', borderRadius: '8px', display: 'inline-block', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px',
+                                            padding: '4px 10px', borderRadius: 'var(--radius-sm)', display: 'inline-block', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px',
                                             background: job.status === 'pending' ? '#FFFBEB' : job.status === 'approved' ? '#ECFDF5' : '#FEF2F2',
                                             color: job.status === 'pending' ? '#D97706' : job.status === 'approved' ? '#059669' : '#DC2626',
                                             marginBottom: '6px'
                                         }}>
                                             {job.status}
                                         </div>
-                                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#1E293B', lineHeight: 1.4 }}>{job.title}</h3>
+                                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{job.title}</h3>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem', padding: '1.25rem', borderRadius: '20px', background: '#F8FAFC' }}>
-                                <div style={{ fontWeight: 700, color: '#475569', fontSize: '0.95rem', marginBottom: '8px' }}>
+                            <div style={{ marginBottom: 'var(--spacing-lg)', padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-xl)', background: 'var(--color-background-alt)' }}>
+                                <div style={{ fontWeight: 700, color: 'var(--color-text-secondary)', fontSize: '0.95rem', marginBottom: 'var(--spacing-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     🏢 {job.employer?.company_name || job.employer?.full_name || 'Công ty ẩn danh'}
                                 </div>
                                 {activeTab === 'partnership' && (
-                                    <div style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                                         🎓 Liên kết qua: <span style={{ fontWeight: 600, color: '#8B5CF6' }}>{job.school?.full_name}</span>
                                     </div>
                                 )}
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <MapPin size={16} style={{ color: '#3B82F6' }} /> {job.location || 'N/A'}
+                            <div className="admin-job-meta-grid" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', color: 'var(--color-text-secondary)', fontSize: '0.9rem', minWidth: 0 }}>
+                                    <MapPin size={16} style={{ color: '#3B82F6', flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{job.location || 'N/A'}</span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <DollarSign size={16} style={{ color: '#10B981' }} /> {formatSalary(job.salary_min, job.salary_max)}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                                    <DollarSign size={16} style={{ color: '#10B981', flexShrink: 0 }} /> {formatSalary(job.salary_min, job.salary_max)}
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <Calendar size={16} /> {format(new Date(job.created_at), 'dd/MM/yyyy')}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                                    <Calendar size={16} style={{ flexShrink: 0 }} /> {format(new Date(job.created_at), 'dd/MM/yyyy')}
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748B', fontSize: '0.9rem' }}>
-                                    <Clock size={16} /> {job.type === 'regular' ? 'Full-time' : 'Liên kết'}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                                    <Clock size={16} style={{ flexShrink: 0 }} /> {job.type === 'regular' ? 'Full-time' : 'Liên kết'}
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                <button className="btn btn-outline" style={{ flex: 1, height: '48px', borderRadius: '12px' }}>Chi tiết</button>
+                            <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap' }}>
+                                <button className="btn btn-outline" style={{ flex: 1, height: '48px', borderRadius: 'var(--radius-md)', minWidth: '100px' }}>Chi tiết</button>
                                 {job.status === 'pending' && (
                                     <>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleApprove(job); }}
                                             className="btn btn-primary"
-                                            style={{ flex: 1, height: '48px', borderRadius: '12px' }}
+                                            style={{ flex: 1, height: '48px', borderRadius: 'var(--radius-md)', minWidth: '100px' }}
                                             disabled={actionLoading}
                                         >
                                             Phê duyệt
@@ -309,7 +316,7 @@ export default function AdminJobsPage() {
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleReject(job); }}
                                             className="btn btn-outline"
-                                            style={{ color: '#EF4444', borderColor: '#FEE2E2', background: '#FEF2F2', padding: '0 1rem', borderRadius: '12px' }}
+                                            style={{ color: '#EF4444', borderColor: '#FEE2E2', background: '#FEF2F2', padding: '0 var(--spacing-md)', borderRadius: 'var(--radius-md)' }}
                                             disabled={actionLoading}
                                         >
                                             <X size={20} />
@@ -322,50 +329,47 @@ export default function AdminJobsPage() {
                 </div>
             )}
 
-            {/* Modal - Improved Design */}
             {showDetailModal && selectedJob && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-                    <div style={{ background: 'white', width: '100%', maxWidth: '900px', borderRadius: '32px', overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
-                        <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)', color: 'white', position: 'relative' }}>
-                            <button onClick={() => setShowDetailModal(false)} style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', width: '44px', height: '44px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
-                            <div style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.15)', borderRadius: '8px', display: 'inline-block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '1rem', letterSpacing: '1px' }}>
+                <div className="admin-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--spacing-xl)' }}>
+                    <div className="admin-modal-content animate-scale-in" style={{ background: 'white', width: '100%', maxWidth: '900px', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+                        <div style={{ padding: 'var(--spacing-2xl)', background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)', color: 'white', position: 'relative' }}>
+                            <button onClick={() => setShowDetailModal(false)} style={{ position: 'absolute', top: 'var(--spacing-xl)', right: 'var(--spacing-xl)', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', width: '44px', height: '44px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                            <div style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.15)', borderRadius: 'var(--radius-sm)', display: 'inline-block', fontSize: '0.8rem', fontWeight: 700, marginBottom: 'var(--spacing-md)', letterSpacing: '1px' }}>
                                 {selectedJob.type.toUpperCase()}
                             </div>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 900, margin: 0, lineHeight: 1.2 }}>{selectedJob.title}</h2>
-                            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem', opacity: 0.8, fontSize: '1rem' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={18} /> {selectedJob.location}</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><DollarSign size={18} /> {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Calendar size={18} /> {format(new Date(selectedJob.created_at), 'dd/MM/yyyy')}</span>
+                            <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 900, margin: 0, lineHeight: 1.2 }}>{selectedJob.title}</h2>
+                            <div className="admin-modal-meta" style={{ display: 'flex', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-lg)', opacity: 0.8, fontSize: '1rem', flexWrap: 'wrap' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}><MapPin size={18} /> {selectedJob.location}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}><DollarSign size={18} /> {formatSalary(selectedJob.salary_min, selectedJob.salary_max)}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}><Calendar size={18} /> {format(new Date(selectedJob.created_at), 'dd/MM/yyyy')}</span>
                             </div>
                         </div>
 
-                        <div style={{ padding: '0 2.5rem 2.5rem', overflowY: 'auto' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '3rem', marginTop: '2.5rem' }}>
+                        <div style={{ padding: '0 var(--spacing-2xl) var(--spacing-2xl)', overflowY: 'auto' }}>
+                            <div className="admin-modal-body">
                                 <div>
-                                    <section style={{ marginBottom: '2.5rem' }}>
-                                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>Mô tả công việc</h3>
-                                        <div style={{ lineHeight: 1.8, color: '#475569', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.description}</div>
+                                    <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)' }}>Mô tả công việc</h3>
+                                        <div style={{ lineHeight: 1.8, color: 'var(--color-text-secondary)', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.description}</div>
                                     </section>
 
-                                    <section style={{ marginBottom: '2.5rem' }}>
-                                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>Yêu cầu ứng viên</h3>
-                                        <div style={{ lineHeight: 1.8, color: '#475569', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.requirements}</div>
+                                    <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)' }}>Yêu cầu ứng viên</h3>
+                                        <div style={{ lineHeight: 1.8, color: 'var(--color-text-secondary)', fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedJob.requirements}</div>
                                     </section>
 
-                                    {/* Additional Job Details */}
                                     {selectedJob.metadata && (
                                         <>
-                                            {/* Fields/Lĩnh vực */}
                                             {selectedJob.metadata.fields && selectedJob.metadata.fields.length > 0 && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
                                                         <Target size={24} style={{ color: '#3B82F6' }} /> Lĩnh vực
                                                     </h3>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                                                         {selectedJob.metadata.fields.map((field: string, idx: number) => (
                                                             <span key={idx} style={{
-                                                                padding: '0.5rem 1rem',
-                                                                borderRadius: '12px',
+                                                                padding: 'var(--spacing-sm) var(--spacing-md)',
+                                                                borderRadius: 'var(--radius-md)',
                                                                 background: 'rgba(59, 130, 246, 0.1)',
                                                                 color: '#3B82F6',
                                                                 fontSize: '0.9rem',
@@ -378,15 +382,14 @@ export default function AdminJobsPage() {
                                                 </section>
                                             )}
 
-                                            {/* Experience Required */}
                                             {selectedJob.metadata.experience_required && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
                                                         <BarChart3 size={24} style={{ color: '#8B5CF6' }} /> Kinh nghiệm yêu cầu
                                                     </h3>
                                                     <div style={{
-                                                        padding: '1rem 1.5rem',
-                                                        borderRadius: '12px',
+                                                        padding: 'var(--spacing-md) var(--spacing-lg)',
+                                                        borderRadius: 'var(--radius-md)',
                                                         background: 'rgba(139, 92, 246, 0.1)',
                                                         color: '#8B5CF6',
                                                         fontSize: '1.1rem',
@@ -398,17 +401,16 @@ export default function AdminJobsPage() {
                                                 </section>
                                             )}
 
-                                            {/* Working Regions */}
                                             {selectedJob.metadata.working_regions && selectedJob.metadata.working_regions.length > 0 && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
                                                         <MapPin size={24} style={{ color: '#10B981' }} /> Khu vực làm việc
                                                     </h3>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                                                         {selectedJob.metadata.working_regions.map((region: string, idx: number) => (
                                                             <span key={idx} style={{
-                                                                padding: '0.5rem 1rem',
-                                                                borderRadius: '12px',
+                                                                padding: 'var(--spacing-sm) var(--spacing-md)',
+                                                                borderRadius: 'var(--radius-md)',
                                                                 background: 'rgba(16, 185, 129, 0.1)',
                                                                 color: '#10B981',
                                                                 fontSize: '0.9rem',
@@ -421,19 +423,14 @@ export default function AdminJobsPage() {
                                                 </section>
                                             )}
 
-                                            {/* Benefits */}
                                             {selectedJob.metadata.benefits && selectedJob.metadata.benefits.length > 0 && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
                                                         <Gem size={24} style={{ color: '#3B82F6' }} /> Quyền lợi
                                                     </h3>
-                                                    <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+                                                    <ul style={{ paddingLeft: 'var(--spacing-lg)', margin: 0 }}>
                                                         {selectedJob.metadata.benefits.map((benefit: string, idx: number) => (
-                                                            <li key={idx} style={{
-                                                                lineHeight: 2,
-                                                                color: '#475569',
-                                                                fontSize: '1.05rem'
-                                                            }}>
+                                                            <li key={idx} style={{ lineHeight: 2, color: 'var(--color-text-secondary)', fontSize: '1.05rem' }}>
                                                                 {benefit}
                                                             </li>
                                                         ))}
@@ -441,22 +438,21 @@ export default function AdminJobsPage() {
                                                 </section>
                                             )}
 
-                                            {/* Requirements Tags */}
                                             {selectedJob.metadata.requirements_tags && selectedJob.metadata.requirements_tags.length > 0 && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                        <Tags size={24} style={{ color: '#64748B' }} /> Tags
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+                                                        <Tags size={24} style={{ color: 'var(--color-text-secondary)' }} /> Tags
                                                     </h3>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                                                         {selectedJob.metadata.requirements_tags.map((tag: string, idx: number) => (
                                                             <span key={idx} style={{
-                                                                padding: '0.5rem 1rem',
-                                                                borderRadius: '20px',
-                                                                background: '#F1F5F9',
-                                                                color: '#475569',
+                                                                padding: 'var(--spacing-sm) var(--spacing-md)',
+                                                                borderRadius: 'var(--radius-full)',
+                                                                background: 'var(--color-border-light)',
+                                                                color: 'var(--color-text-secondary)',
                                                                 fontSize: '0.85rem',
                                                                 fontWeight: 600,
-                                                                border: '1px solid #E2E8F0'
+                                                                border: '1px solid var(--color-border)'
                                                             }}>
                                                                 #{tag}
                                                             </span>
@@ -465,15 +461,14 @@ export default function AdminJobsPage() {
                                                 </section>
                                             )}
 
-                                            {/* Employment Types */}
                                             {selectedJob.metadata.employment_types && selectedJob.metadata.employment_types.length > 0 && (
-                                                <section style={{ marginBottom: '2.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1E293B', marginBottom: '1rem' }}>💼 Loại hình công việc</h3>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                <section style={{ marginBottom: 'var(--spacing-2xl)' }}>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: 'var(--spacing-md)' }}>💼 Loại hình công việc</h3>
+                                                    <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                                                         {selectedJob.metadata.employment_types.map((type: string, idx: number) => (
                                                             <span key={idx} style={{
-                                                                padding: '0.5rem 1rem',
-                                                                borderRadius: '12px',
+                                                                padding: 'var(--spacing-sm) var(--spacing-md)',
+                                                                borderRadius: 'var(--radius-md)',
                                                                 background: 'rgba(251, 140, 0, 0.1)',
                                                                 color: '#FB8C00',
                                                                 fontSize: '0.9rem',
@@ -488,24 +483,24 @@ export default function AdminJobsPage() {
                                         </>
                                     )}
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                    <div style={{ padding: '1.5rem', borderRadius: '24px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                                        <h4 style={{ margin: '0 0 1rem 0', color: '#64748B', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 700 }}>Đơn vị tuyển dụng</h4>
-                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.25rem' }}>
-                                            <div style={{ width: '54px', height: '54px', borderRadius: '14px', background: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                <div className="admin-modal-sidebar">
+                                    <div style={{ padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-2xl)', background: 'var(--color-background-alt)', border: '1px solid var(--color-border)' }}>
+                                        <h4 style={{ margin: '0 0 var(--spacing-md) 0', color: 'var(--color-text-secondary)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 700 }}>Đơn vị tuyển dụng</h4>
+                                        <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
+                                            <div style={{ width: '54px', height: '54px', borderRadius: 'var(--radius-lg)', background: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                                                 {selectedJob.employer?.avatar_url ? <img src={selectedJob.employer.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🏢'}
                                             </div>
-                                            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1E293B' }}>{selectedJob.employer?.company_name || selectedJob.employer?.full_name}</div>
+                                            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedJob.employer?.company_name || selectedJob.employer?.full_name}</div>
                                         </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><Mail size={16} style={{ color: '#3B82F6' }} /> {selectedJob.employer?.email}</div>
-                                            {selectedJob.employer?.phone && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: '#475569' }}><Phone size={16} style={{ color: '#10B981' }} /> {selectedJob.employer.phone}</div>}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}><Mail size={16} style={{ color: '#3B82F6', flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedJob.employer?.email}</span></div>
+                                            {selectedJob.employer?.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}><Phone size={16} style={{ color: '#10B981', flexShrink: 0 }} /> {selectedJob.employer.phone}</div>}
                                         </div>
                                     </div>
 
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                        <button onClick={() => handleApprove(selectedJob)} className="btn btn-primary" style={{ height: '56px', borderRadius: '16px', fontSize: '1.1rem', fontWeight: 800 }} disabled={actionLoading}>Phê duyệt ngay</button>
-                                        <button onClick={() => handleReject(selectedJob)} className="btn btn-outline" style={{ height: '56px', borderRadius: '16px', color: '#EF4444', borderColor: '#FEE2E2', background: '#FEF2F2', fontWeight: 700 }} disabled={actionLoading}>Từ chối</button>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                                        <button onClick={() => handleApprove(selectedJob)} className="btn btn-primary" style={{ height: '56px', borderRadius: 'var(--radius-lg)', fontSize: '1.1rem', fontWeight: 800 }} disabled={actionLoading}>Phê duyệt ngay</button>
+                                        <button onClick={() => handleReject(selectedJob)} className="btn btn-outline" style={{ height: '56px', borderRadius: 'var(--radius-lg)', color: '#EF4444', borderColor: '#FEE2E2', background: '#FEF2F2', fontWeight: 700 }} disabled={actionLoading}>Từ chối</button>
                                     </div>
                                 </div>
                             </div>
@@ -515,6 +510,99 @@ export default function AdminJobsPage() {
             )}
 
             <style>{`
+                .admin-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                    margin-bottom: var(--spacing-3xl);
+                    gap: var(--spacing-lg);
+                    flex-wrap: wrap;
+                }
+                @media (max-width: 767px) {
+                    .admin-header { flex-direction: column; align-items: flex-start; }
+                }
+
+                .admin-tab-switcher {
+                    display: flex;
+                    gap: 'var(--spacing-xs)';
+                    background: var(--color-border);
+                    padding: var(--spacing-sm);
+                    borderRadius: var(--radius-full);
+                }
+                .admin-tab-switcher button {
+                    padding: var(--spacing-md) var(--spacing-lg);
+                    border-radius: var(--radius-lg);
+                    border: none;
+                    font-weight: 700;
+                    cursor: pointer;
+                    background: transparent;
+                    color: var(--color-text-secondary);
+                    transition: all var(--transition-base);
+                    white-space: nowrap;
+                    font-size: 0.9rem;
+                }
+                .admin-tab-switcher button.active {
+                    background: white;
+                    color: var(--color-primary);
+                    box-shadow: var(--shadow-sm);
+                }
+                .admin-tab-switcher button:hover:not(.active) {
+                    background: rgba(255,255,255,0.5);
+                }
+
+                .admin-filter-controls {
+                    display: flex;
+                    gap: var(--spacing-lg);
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+                @media (max-width: 767px) {
+                    .admin-filter-controls { flex-direction: column; align-items: stretch; }
+                    .admin-filter-controls > * { width: 100% !important; }
+                }
+
+                .admin-jobs-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+                    gap: var(--spacing-lg);
+                }
+
+                .admin-job-meta-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: var(--spacing-md);
+                }
+                @media (max-width: 479px) {
+                    .admin-job-meta-grid { grid-template-columns: 1fr; }
+                }
+
+                .admin-modal-overlay {
+                    padding: var(--spacing-xl);
+                }
+                @media (max-width: 767px) {
+                    .admin-modal-overlay { padding: var(--spacing-md); align-items: flex-start; }
+                }
+
+                .admin-modal-body {
+                    display: grid;
+                    grid-template-columns: 1fr 300px;
+                    gap: var(--spacing-2xl);
+                    margin-top: var(--spacing-2xl);
+                }
+                @media (max-width: 1023px) {
+                    .admin-modal-body { grid-template-columns: 1fr; }
+                }
+
+                .admin-modal-meta {
+                    flex-wrap: wrap;
+                }
+
+                .admin-modal-sidebar {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--spacing-xl);
+                }
+
                 .hover-lift:hover {
                     transform: translateY(-4px);
                     box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.01);

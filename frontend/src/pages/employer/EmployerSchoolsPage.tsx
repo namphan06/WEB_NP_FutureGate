@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-    Check, X, Search,
+    X, Search,
     School, Clock, CheckCircle, AlertCircle,
     MapPin, Calendar, DollarSign, Target, BarChart3, Gem, Tags,
     Mail, Phone, Briefcase
@@ -93,7 +93,7 @@ export default function EmployerSchoolsPage() {
 
                     const enriched = allRequests.map(r => ({
                         ...r,
-                        school: profilesMap[r.school_id] || {},
+                        school: profilesMap[r.school_id] || {} as any,
                     }));
                     setRequests(enriched);
                 } else {
@@ -170,15 +170,15 @@ export default function EmployerSchoolsPage() {
                         overflow: 'hidden',
                         flexShrink: 0
                     }}>
-                        {school.avatar_url ? (
-                            <img src={school.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {(school as any).avatar_url ? (
+                            <img src={(school as any).avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             <School size={32} style={{ color: 'white' }} />
                         )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: '#8B5CF6', letterSpacing: '0.5px', marginBottom: '4px' }}>
-                            {school.full_name || 'Trường đối tác'}
+                            {(school as any).full_name || 'Trường đối tác'}
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1E293B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {metadata.title || 'Không có tiêu đề'}

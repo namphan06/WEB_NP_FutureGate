@@ -4,8 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 import {
     FiEdit, FiTrash2, FiEye, FiUsers, FiPlus,
-    FiSearch, FiFilter, FiCalendar, FiMapPin,
-    FiMessageSquare, FiBarChart2, FiClock
+    FiSearch, FiCalendar, FiClock, FiFileText
 } from 'react-icons/fi';
 
 export default function SchoolManageJobsPage() {

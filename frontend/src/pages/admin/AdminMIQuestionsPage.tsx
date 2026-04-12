@@ -292,7 +292,7 @@ export default function AdminMIQuestionsPage() {
                             <p style={{ color: '#64748B', margin: 0 }}>Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc.</p>
                         </div>
                     ) : (
-                        filteredQuestions.map((q, idx) => {
+                        filteredQuestions.map((q) => {
                             const typeStyle = TYPE_COLORS[q.intelligence_type] || TYPE_COLORS.EX;
                             return (
                                 <div key={q.id} className="question-row" style={{

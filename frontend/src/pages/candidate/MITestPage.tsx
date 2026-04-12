@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import {
     ChevronRight, ChevronLeft, CheckCircle2, AlertCircle,
-    Brain, Lightbulb, Trophy, History
+    Brain, Trophy, History
 } from 'lucide-react';
 
 type Step = 'intro' | 'testing' | 'result' | 'history';

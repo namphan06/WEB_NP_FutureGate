@@ -2,27 +2,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-    Link as LinkIcon,
     Check,
     X,
     Search,
     MapPin,
     Clock,
-    Calendar,
     DollarSign,
-    Mail,
-    Phone,
     Target,
     BarChart3,
     Gem,
     Tags,
     Briefcase,
-    AlertCircle,
     Building2,
     Shield
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
 
 interface PartnershipJob {
     id: string;
