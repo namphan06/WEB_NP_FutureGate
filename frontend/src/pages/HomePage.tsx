@@ -184,7 +184,7 @@ export default function HomePage() {
     return (
         <div className="home-page">
             {/* Promo Banner */}
-            <div style={{
+            <div className="home-promo-banner" style={{
                 background: 'linear-gradient(90deg, #FFD700 0%, #FFA500 100%)',
                 padding: 'var(--spacing-sm) 0',
                 textAlign: 'center'
@@ -210,7 +210,7 @@ export default function HomePage() {
             </div>
 
             {/* Hero Section with Glassmorphism */}
-            <section style={{
+            <section className="home-hero" style={{
                 background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
                 padding: 'var(--spacing-2xl) 0 var(--spacing-3xl)',
                 color: 'white',
@@ -239,7 +239,7 @@ export default function HomePage() {
                     pointerEvents: 'none'
                 }} />
 
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                <div className="container home-hero-content" style={{ position: 'relative', zIndex: 1 }}>
                     <h1 style={{
                         fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
                         fontWeight: 700,
@@ -261,7 +261,7 @@ export default function HomePage() {
 
                     {/* Search Bar */}
                     <form onSubmit={handleSearch}>
-                        <div style={{
+                        <div className="home-search-panel" style={{
                             background: 'rgba(255, 255, 255, 0.95)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
@@ -276,7 +276,7 @@ export default function HomePage() {
                             alignItems: 'center'
                         }}>
                             {/* Category Dropdown */}
-                            <div style={{ position: 'relative', minWidth: '160px' }}>
+                            <div className="home-search-field home-search-category" style={{ position: 'relative', minWidth: '160px' }}>
                                 <select
                                     value={category}
                                     onChange={(e) => setCategory(e.target.value)}
@@ -308,7 +308,7 @@ export default function HomePage() {
                             </div>
 
                             {/* Search Input */}
-                            <div style={{ position: 'relative' }}>
+                            <div className="home-search-field home-search-keyword" style={{ position: 'relative' }}>
                                 <FiSearch size={20} style={{
                                     position: 'absolute',
                                     left: '0.75rem',
@@ -333,7 +333,7 @@ export default function HomePage() {
                             </div>
 
                             {/* Location */}
-                            <div style={{ position: 'relative', minWidth: '140px' }}>
+                            <div className="home-search-field home-search-location" style={{ position: 'relative', minWidth: '140px' }}>
                                 <select
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
@@ -366,7 +366,7 @@ export default function HomePage() {
                             </div>
 
                             {/* Search Button */}
-                            <button type="submit" className="btn btn-primary" style={{
+                            <button type="submit" className="btn btn-primary home-search-submit" style={{
                                 padding: '0.875rem 1.5rem',
                                 fontSize: '1rem',
                                 fontWeight: 600,
@@ -379,7 +379,7 @@ export default function HomePage() {
                     </form>
 
                     {/* Quick Tags */}
-                    <div style={{
+                    <div className="home-quick-tags" style={{
                         marginTop: 'var(--spacing-lg)',
                         display: 'flex',
                         alignItems: 'center',
@@ -417,14 +417,13 @@ export default function HomePage() {
             </section>
 
             {/* Main Content: Sidebar + Jobs */}
-            <section style={{ padding: 'var(--spacing-2xl) 0', background: 'var(--color-background)' }}>
+            <section className="home-main-section" style={{ padding: 'var(--spacing-2xl) 0', background: 'var(--color-background)' }}>
                 <div className="container">
                     {/* Mobile Sidebar Toggle */}
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="btn btn-secondary"
+                        className="btn btn-secondary home-sidebar-toggle"
                         style={{
-                            display: 'none',
                             marginBottom: 'var(--spacing-lg)',
                             width: '100%',
                             justifyContent: 'space-between'
@@ -437,14 +436,14 @@ export default function HomePage() {
                         {sidebarOpen ? <FiX size={18} /> : <FiChevronDown size={18} />}
                     </button>
 
-                    <div style={{
+                    <div className="home-main-grid" style={{
                         display: 'grid',
                         gridTemplateColumns: '350px 1fr',
                         gap: 'var(--spacing-2xl)'
                     }}>
                         {/* Sidebar Categories */}
-                        <aside className={sidebarOpen ? 'sidebar-visible' : 'sidebar-hidden'}>
-                            <div className="card" style={{ padding: 'var(--spacing-lg)', position: 'sticky', top: '80px' }}>
+                        <aside className={sidebarOpen ? 'home-sidebar-visible' : 'home-sidebar-hidden'}>
+                            <div className="card home-category-card" style={{ padding: 'var(--spacing-lg)', position: 'sticky', top: 'calc(var(--header-height) + 16px)' }}>
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'space-between',
@@ -455,9 +454,9 @@ export default function HomePage() {
                                         Danh mục ngành nghề
                                     </h3>
                                     <button
+                                        className="home-sidebar-close"
                                         onClick={() => setSidebarOpen(false)}
                                         style={{
-                                            display: 'none',
                                             background: 'none',
                                             border: 'none',
                                             cursor: 'pointer',
@@ -505,21 +504,26 @@ export default function HomePage() {
 
                         {/* Job Listings */}
                         <div>
-                            <h2 style={{ marginBottom: 'var(--spacing-lg)' }}>Việc làm tốt nhất</h2>
+                            <div className="home-jobs-header" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                                <h2 style={{ marginBottom: 'var(--spacing-xs)' }}>Việc làm tốt nhất</h2>
+                                <p style={{ marginBottom: 0, fontSize: '0.95rem', color: 'var(--color-text-secondary)' }}>
+                                    {loading ? 'Đang tải dữ liệu việc làm mới...' : `${jobs.length} cơ hội đang phù hợp với bạn`}
+                                </p>
+                            </div>
 
                             {loading ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+                                <div className="home-jobs-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
                                     <JobCardSkeleton />
                                     <JobCardSkeleton />
                                     <JobCardSkeleton />
                                 </div>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+                                <div className="home-jobs-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
                                     {jobs.map((job) => (
                                         <Link
                                             key={job.id}
                                             to={`/jobs/${job.id}`}
-                                            className="job-card"
+                                            className="job-card home-job-card"
                                             style={{
                                                 display: 'grid',
                                                 gridTemplateColumns: '100px 1fr auto',
@@ -529,7 +533,7 @@ export default function HomePage() {
                                             }}
                                         >
                                             {/* Company Logo */}
-                                            <div style={{
+                                            <div className="home-job-logo" style={{
                                                 width: '100px',
                                                 height: '100px',
                                                 borderRadius: 'var(--radius-lg)',
@@ -581,8 +585,8 @@ export default function HomePage() {
                                             </div>
 
                                             {/* Job Info */}
-                                            <div>
-                                                <h4 style={{
+                                            <div className="home-job-content">
+                                                <h4 className="home-job-title" style={{
                                                     fontSize: '1.125rem',
                                                     marginBottom: '0.5rem',
                                                     color: 'var(--color-text)',
@@ -590,7 +594,7 @@ export default function HomePage() {
                                                 }}>
                                                     {job.metadata.title}
                                                 </h4>
-                                                <div style={{
+                                                <div className="home-job-company" style={{
                                                     fontSize: '0.9375rem',
                                                     color: 'var(--color-text-secondary)',
                                                     marginBottom: 'var(--spacing-md)'
@@ -598,7 +602,7 @@ export default function HomePage() {
                                                     {(job as any).employer?.company_name || (job as any).employer?.full_name || 'Công ty tuyển dụng'}
                                                 </div>
 
-                                                <div style={{ display: 'flex', gap: 'var(--spacing-lg)', flexWrap: 'wrap' }}>
+                                                <div className="home-job-meta" style={{ display: 'flex', gap: 'var(--spacing-lg)', flexWrap: 'wrap' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
                                                         <FiDollarSign size={16} />
                                                         <span style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
@@ -619,6 +623,7 @@ export default function HomePage() {
                                             {/* Save Button */}
                                             <button
                                                 onClick={(e) => handleSave(e, job.id)}
+                                                className="home-job-save"
                                                 style={{
                                                     width: '40px',
                                                     height: '40px',
@@ -659,109 +664,221 @@ export default function HomePage() {
                 </div>
             </section >
 
-            {/* Responsive Styles */}
+            {/* Homepage Styles */}
             <style>{`
-                /* Mobile sidebar toggle visibility */
-                @media (max-width: 1023px) {
-                    .home-page button[style*="display: 'none'"] {
-                        display: flex !important;
-                    }
+                .home-hero-content {
+                    max-width: 1080px;
                 }
 
-                /* Sidebar hidden by default on mobile */
-                @media (max-width: 1023px) {
-                    .sidebar-hidden {
-                        display: none;
-                    }
-                    .sidebar-visible {
-                        display: block;
-                    }
+                .home-search-panel {
+                    border-radius: var(--radius-xl) !important;
                 }
 
-                /* Search bar stacks vertically on mobile */
-                @media (max-width: 767px) {
-                    .home-page form > div {
-                        grid-template-columns: 1fr !important;
-                        padding: var(--spacing-md) !important;
-                    }
-                    .home-page form > div > div {
-                        min-width: 100% !important;
-                        border-right: none !important;
-                        border-bottom: 1px solid var(--color-divider);
-                    }
-                    .home-page form > div > div:last-of-type {
-                        border-bottom: none;
-                    }
-                    .home-page form > div > button {
-                        width: 100%;
-                        justify-content: center;
-                    }
-                    .home-page form > div select,
-                    .home-page form > div input {
-                        border-right: none !important;
-                    }
+                .home-search-field {
+                    min-height: 52px;
                 }
 
-                /* Sidebar + Jobs single column on tablet/mobile */
-                @media (max-width: 1023px) {
-                    .home-page section > .container > div {
-                        grid-template-columns: 1fr !important;
+                .home-search-submit {
+                    min-height: 52px;
+                    border-radius: var(--radius-md);
+                }
+
+                .home-quick-tags a {
+                    line-height: 1.2;
+                }
+
+                .home-main-section {
+                    padding-top: var(--spacing-2xl) !important;
+                }
+
+                .home-main-grid {
+                    align-items: start;
+                }
+
+                .home-sidebar-toggle {
+                    display: none;
+                }
+
+                .home-sidebar-close {
+                    display: none;
+                }
+
+                .home-sidebar-hidden,
+                .home-sidebar-visible {
+                    display: block;
+                }
+
+                .home-category-card {
+                    border-radius: var(--radius-xl);
+                    box-shadow: var(--shadow-md);
+                }
+
+                .home-jobs-header h2 {
+                    letter-spacing: -0.01em;
+                }
+
+                .home-job-card {
+                    border-radius: var(--radius-xl);
+                    box-shadow: var(--shadow-sm);
+                    border: 1px solid var(--color-border-light);
+                    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+                }
+
+                .home-job-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-lg);
+                    border-color: var(--color-primary-100);
+                }
+
+                .home-job-title {
+                    line-height: 1.35;
+                }
+
+                .home-job-company {
+                    font-weight: 500;
+                }
+
+                .home-job-meta {
+                    row-gap: var(--spacing-sm);
+                }
+
+                .home-job-save {
+                    align-self: start;
+                }
+
+                /* Tablet layout */
+                @media (max-width: 1199px) {
+                    .home-main-grid {
+                        grid-template-columns: 300px 1fr !important;
                         gap: var(--spacing-xl) !important;
                     }
+
+                    .home-job-card {
+                        grid-template-columns: 88px 1fr auto !important;
+                        padding: var(--spacing-lg) !important;
+                        gap: var(--spacing-lg) !important;
+                    }
+
+                    .home-job-logo {
+                        width: 88px !important;
+                        height: 88px !important;
+                    }
                 }
 
-                /* Job card responsive adjustments */
+                /* Sidebar + Jobs single column on mobile/tablet */
+                @media (max-width: 1023px) {
+                    .home-main-grid {
+                        grid-template-columns: 1fr !important;
+                        gap: var(--spacing-lg) !important;
+                    }
+
+                    .home-sidebar-toggle {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .home-sidebar-close {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .home-sidebar-hidden {
+                        display: none;
+                    }
+
+                    .home-sidebar-visible {
+                        display: block;
+                    }
+
+                    .home-category-card {
+                        position: static !important;
+                    }
+                }
+
+                /* Search + cards on phone */
                 @media (max-width: 767px) {
-                    .home-page .job-card {
+                    .home-promo-banner {
+                        padding: var(--spacing-xs) 0 !important;
+                    }
+
+                    .home-promo-banner .container {
+                        flex-direction: column !important;
+                        gap: var(--spacing-xs) !important;
+                    }
+
+                    .home-hero {
+                        padding: var(--spacing-xl) 0 var(--spacing-2xl) !important;
+                    }
+
+                    .home-search-panel {
+                        grid-template-columns: 1fr !important;
+                        padding: var(--spacing-md) !important;
+                        gap: 0 !important;
+                    }
+
+                    .home-search-field {
+                        min-width: 100% !important;
+                        border-bottom: 1px solid var(--color-divider);
+                        padding: var(--spacing-xs) 0;
+                    }
+
+                    .home-search-field:last-of-type {
+                        border-bottom: none;
+                    }
+
+                    .home-search-submit {
+                        width: 100%;
+                        justify-content: center;
+                        margin-top: var(--spacing-sm);
+                    }
+
+                    .home-search-field select,
+                    .home-search-field input {
+                        border-right: none !important;
+                    }
+
+                    .home-job-card {
                         grid-template-columns: 80px 1fr !important;
                         gap: var(--spacing-md) !important;
                         padding: var(--spacing-md) !important;
                     }
-                    .home-page .job-card > div:first-child {
+
+                    .home-job-logo {
                         width: 80px !important;
                         height: 80px !important;
                     }
-                    .home-page .job-card > button:last-child {
+
+                    .home-job-save {
                         grid-column: 1 / -1;
                         justify-self: end;
                     }
                 }
 
                 @media (max-width: 479px) {
-                    .home-page .job-card {
+                    .home-job-card {
                         grid-template-columns: 1fr !important;
-                        text-align: center;
+                        padding: var(--spacing-md) !important;
                     }
-                    .home-page .job-card > div:first-child {
+
+                    .home-job-logo {
                         width: 60px !important;
                         height: 60px !important;
-                        margin: 0 auto;
                     }
-                    .home-page .job-card > div:nth-child(2) {
-                        order: 2;
-                    }
-                    .home-page .job-card > button:last-child {
-                        position: absolute;
-                        top: var(--spacing-md);
-                        right: var(--spacing-md);
-                    }
-                }
 
-                /* Promo banner responsive */
-                @media (max-width: 767px) {
-                    .home-page > div:first-child {
-                        padding: var(--spacing-xs) 0 !important;
+                    .home-job-content {
+                        text-align: left;
                     }
-                    .home-page > div:first-child .container {
-                        flex-direction: column !important;
+
+                    .home-job-meta {
+                        flex-direction: column;
                         gap: var(--spacing-xs) !important;
+                        align-items: flex-start;
                     }
-                }
 
-                /* Hero section responsive */
-                @media (max-width: 767px) {
-                    .home-page section:first-of-type {
-                        padding: var(--spacing-xl) 0 var(--spacing-2xl) !important;
+                    .home-job-save {
+                        grid-column: auto;
+                        justify-self: start;
                     }
                 }
             `}</style>

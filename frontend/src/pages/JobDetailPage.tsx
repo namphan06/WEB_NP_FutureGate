@@ -356,7 +356,7 @@ export default function JobDetailPage() {
             const { data, error } = await supabase
                 .from('cv_templates')
                 .select('id, title, updated_at')
-                .eq('user_id', user?.id)
+                .eq('user_create', user?.id)
                 .order('updated_at', { ascending: false });
 
             if (error) throw error;

@@ -30,6 +30,17 @@ export default function CVEditorPage() {
                 .single();
 
             if (error) throw error;
+
+            const mcvCode = (data?.mcv || data?.data?.mcv || '').toUpperCase();
+            const typeCode = (data?.type || data?.data?.type || '').toLowerCase();
+            const fileUrl = data?.file_url || data?.data?.file_url || data?.data?.fileUrl;
+
+            if ((mcvCode === 'UPLOAD' || typeCode === 'upload') && fileUrl) {
+                window.open(fileUrl, '_blank', 'noopener,noreferrer');
+                navigate('/candidate/cv');
+                return;
+            }
+
             setCvData(data.data as CVData);
             setCvTitle(data.title);
         } catch (error) {

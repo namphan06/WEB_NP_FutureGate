@@ -250,14 +250,14 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     onClick={handleBackdropClick}
                     style={{
                         position: 'fixed',
-                        top: 0,
+                        top: 'var(--header-height)',
                         left: 0,
                         right: 0,
                         bottom: 0,
                         background: 'rgba(0, 0, 0, 0.5)',
                         backdropFilter: 'blur(4px)',
                         WebkitBackdropFilter: 'blur(4px)',
-                        zIndex: 'calc(var(--z-fixed) - 1)',
+                        zIndex: 'calc(var(--z-sticky) - 2)',
                         animation: 'fade-in 0.3s ease-out'
                     }}
                 />
@@ -267,22 +267,22 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 ref={sidebarRef}
                 style={{
                     position: isMobile ? 'fixed' : 'fixed',
-                    top: 0,
+                    top: isMobile ? 'var(--header-height)' : 0,
                     left: 0,
                     width: isMobile ? 'min(300px, 85vw)' : sidebarWidth,
-                    height: '100vh',
-                    maxHeight: '100vh',
+                    height: isMobile ? 'calc(100vh - var(--header-height))' : '100vh',
+                    maxHeight: isMobile ? 'calc(100vh - var(--header-height))' : '100vh',
                     background: 'var(--glass-bg-dark)',
                     backdropFilter: 'var(--glass-blur)',
                     WebkitBackdropFilter: 'var(--glass-blur)',
                     borderRight: isMobile ? 'none' : '1px solid var(--color-border)',
-                    zIndex: isMobile ? 'var(--z-modal)' : 'var(--z-fixed)',
+                    zIndex: isMobile ? 'calc(var(--z-sticky) - 1)' : 'var(--z-fixed)',
                     transition: isMobile
                         ? 'transform var(--transition-slow)'
                         : 'width var(--transition-slow), transform var(--transition-slow)',
                     display: 'flex',
                     flexDirection: 'column',
-                    paddingTop: 'var(--header-height)',
+                    paddingTop: isMobile ? 'var(--spacing-sm)' : 'var(--header-height)',
                     boxShadow: isMobile
                         ? 'var(--shadow-2xl)'
                         : '10px 0 30px rgba(0,0,0,0.02)',

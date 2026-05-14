@@ -143,7 +143,7 @@ function AppRoutes() {
 
   return (
     <>
-      {user && <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />}
+      {user && <Navbar />}
       {showSidebar && <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />}
 
       <div
@@ -283,6 +283,24 @@ function AppRoutes() {
 
             <Route
               path="/candidate/cv"
+              element={
+                <PrivateRoute>
+                  <CVManagementPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/candidate/cv/create"
+              element={
+                <PrivateRoute>
+                  <CVManagementPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/cv-templates"
               element={
                 <PrivateRoute>
                   <CVManagementPage />

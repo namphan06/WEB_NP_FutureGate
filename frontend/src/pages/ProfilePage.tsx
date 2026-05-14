@@ -136,7 +136,7 @@ export default function ProfilePage() {
         const { data } = await supabase
             .from('cv_templates')
             .select('id, title')
-            .eq('user_id', user.id);
+            .eq('user_create', user.id);
         if (data) setCvs(data);
     };
 

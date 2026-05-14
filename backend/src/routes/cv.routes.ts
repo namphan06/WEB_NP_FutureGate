@@ -12,7 +12,7 @@ router.get('/', authMiddleware, async (req, res) => {
         const { data: cvs, error } = await supabase
             .from('cv_templates')
             .select('*')
-            .eq('user_id', userId)
+            .eq('user_create', userId)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -35,7 +35,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
             .from('cv_templates')
             .select('*')
             .eq('id', id)
-            .eq('user_id', userId)
+            .eq('user_create', userId)
             .single();
 
         if (error) throw error;
@@ -58,7 +58,7 @@ router.post('/', authMiddleware, async (req, res) => {
             .from('cv_templates')
             .insert([
                 {
-                    user_id: userId,
+                    user_create: userId,
                     title,
                     data
                 }
@@ -96,7 +96,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
             .from('cv_templates')
             .update(updates)
             .eq('id', id)
-            .eq('user_id', userId);
+            .eq('user_create', userId);
 
         if (error) throw error;
 
@@ -122,7 +122,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             .from('cv_templates')
             .delete()
             .eq('id', id)
-            .eq('user_id', userId);
+            .eq('user_create', userId);
 
         if (error) throw error;
 

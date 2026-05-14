@@ -965,6 +965,10 @@ img {
 }
 
 @media (max-width: 767px) {
+  :root {
+    --header-height: 72px;
+  }
+
   html {
     font-size: 14px;
   }
@@ -1043,6 +1047,10 @@ img {
 }
 
 @media (max-width: 479px) {
+  :root {
+    --header-height: 64px;
+  }
+
   html {
     font-size: 13px;
   }
