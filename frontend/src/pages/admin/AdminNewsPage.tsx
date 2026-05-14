@@ -588,7 +588,7 @@ export default function AdminNewsPage() {
                                     <button
                                         onClick={() => toggleFeatured(newsItem)}
                                         className="btn btn-outline"
-                                        style={{ width: '40px', height: '40px', borderRadius: '10px', color: newsItem.is_featured ? '#F59E0B' : '#94A3B8' }}
+                                        style={{ width: '40px', height: '40px', padding: 0, borderRadius: '10px', color: newsItem.is_featured ? '#F59E0B' : '#94A3B8' }}
                                         title="Đánh dấu nổi bật"
                                     >
                                         <FiStar />
@@ -596,7 +596,7 @@ export default function AdminNewsPage() {
                                     <button
                                         onClick={() => togglePinned(newsItem)}
                                         className="btn btn-outline"
-                                        style={{ width: '40px', height: '40px', borderRadius: '10px', color: newsItem.is_pinned ? '#EF4444' : '#94A3B8' }}
+                                        style={{ width: '40px', height: '40px', padding: 0, borderRadius: '10px', color: newsItem.is_pinned ? '#EF4444' : '#94A3B8' }}
                                         title="Ghim tin"
                                     >
                                         <FiMapPin />
@@ -604,7 +604,7 @@ export default function AdminNewsPage() {
                                     <button
                                         onClick={() => openEditModal(newsItem)}
                                         className="btn btn-outline"
-                                        style={{ width: '40px', height: '40px', borderRadius: '10px' }}
+                                        style={{ width: '40px', height: '40px', padding: 0, borderRadius: '10px' }}
                                         title="Chỉnh sửa"
                                     >
                                         <FiEdit2 />
@@ -612,7 +612,7 @@ export default function AdminNewsPage() {
                                     <button
                                         onClick={() => handleDelete(newsItem.id)}
                                         className="btn btn-outline"
-                                        style={{ width: '40px', height: '40px', borderRadius: '10px', color: '#EF4444', borderColor: '#FEE2E2' }}
+                                        style={{ width: '40px', height: '40px', padding: 0, borderRadius: '10px', color: '#EF4444', borderColor: '#FEE2E2' }}
                                         title="Xóa"
                                     >
                                         <FiTrash2 />

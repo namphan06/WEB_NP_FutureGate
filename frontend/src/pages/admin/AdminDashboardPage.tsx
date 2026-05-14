@@ -46,7 +46,9 @@ export default function AdminDashboardPage() {
                 { count: totalJobsCount },
                 { count: activeJobsCount },
                 { count: pendingCount },
-                { count: rejectedCount }
+                { count: rejectedCount },
+                { count: pendingPartnershipCount },
+                { count: rejectedPartnershipCount }
             ] = await Promise.all([
                 supabase.from('profiles').select('*', { count: 'exact', head: true }),
                 supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'candidate'),
@@ -55,7 +57,9 @@ export default function AdminDashboardPage() {
                 supabase.from('jobs').select('*', { count: 'exact', head: true }),
                 supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'approved').eq('is_active', true),
                 supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-                supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'rejected')
+                supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+                supabase.from('school_partnership_jobs').select('*', { count: 'exact', head: true }).eq('admin_status', 'pending'),
+                supabase.from('school_partnership_jobs').select('*', { count: 'exact', head: true }).eq('admin_status', 'rejected')
             ]);
 
             setStats({
@@ -65,17 +69,64 @@ export default function AdminDashboardPage() {
                 totalSchools: schoolCount || 0,
                 totalJobs: totalJobsCount || 0,
                 activeJobs: activeJobsCount || 0,
-                pendingJobs: pendingCount || 0,
-                rejectedJobs: rejectedCount || 0,
+                pendingJobs: (pendingCount || 0) + (pendingPartnershipCount || 0),
+                rejectedJobs: (rejectedCount || 0) + (rejectedPartnershipCount || 0),
                 totalApplications: 0
             });
 
-            const [pendingJobsRes, recentUsersRes] = await Promise.all([
-                supabase.from('jobs').select('*, profiles:employer_id(full_name, company_name)').eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
+            const [pendingJobsRes, pendingPartnershipRes, recentUsersRes] = await Promise.all([
+                supabase
+                    .from('jobs')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false })
+                    .limit(5),
+                supabase
+                    .from('school_partnership_jobs')
+                    .select('*')
+                    .eq('admin_status', 'pending')
+                    .order('created_at', { ascending: false })
+                    .limit(5),
                 supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(6)
             ]);
 
-            setPendingJobs(pendingJobsRes.data || []);
+            const normalizedPendingJobs = await Promise.all(
+                (pendingJobsRes.data || []).map(async (job: any) => {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('full_name, company_name')
+                        .eq('id', job.creator_id)
+                        .single();
+
+                    return {
+                        ...job,
+                        metadata: { ...(job.metadata || {}), title: job.metadata?.title || job.title },
+                        profiles: profile || null
+                    };
+                })
+            );
+
+            const normalizedPendingPartnership = await Promise.all(
+                (pendingPartnershipRes.data || []).map(async (job: any) => {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('full_name, company_name')
+                        .eq('id', job.employer_id)
+                        .single();
+
+                    return {
+                        ...job,
+                        metadata: { ...(job.metadata || {}), title: job.metadata?.title || job.title },
+                        profiles: profile || null
+                    };
+                })
+            );
+
+            const mergedPendingJobs = [...normalizedPendingJobs, ...normalizedPendingPartnership]
+                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                .slice(0, 5);
+
+            setPendingJobs(mergedPendingJobs);
             setRecentUsers(recentUsersRes.data || []);
 
         } catch (error) {

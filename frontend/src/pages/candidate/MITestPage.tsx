@@ -137,55 +137,57 @@ export default function MITestPage() {
     if (loading) return <div className="flex items-center justify-center h-full">Đang tải câu hỏi...</div>;
 
     return (
-        <div className="mi-test-container p-6 animate-in fade-in duration-500">
+        <div className="mi-test-container">
             {/* Header section with Premium design */}
-            <div className="max-w-4xl mx-auto mb-8 flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Trắc nghiệm Đa trí thông minh (MI)</h1>
-                    <p className="text-slate-500 font-medium mt-1">Khám phá tiềm năng vượt trội của chính bạn qua 8 loại trí thông minh</p>
-                </div>
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setStep('history')}
-                        className={`p-2.5 rounded-xl transition-all ${step === 'history' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'}`}
-                        title="Lịch sử kiểm tra"
-                    >
-                        <History size={20} />
-                    </button>
+            <div className="mi-wrapper">
+                <div className="mi-header">
+                    <div>
+                        <h1 className="mi-title">Trắc nghiệm Đa trí thông minh (MI)</h1>
+                        <p className="mi-subtitle">Khám phá tiềm năng vượt trội của chính bạn qua 8 loại trí thông minh</p>
+                    </div>
+                    <div className="mi-header-actions">
+                        <button
+                            onClick={() => setStep('history')}
+                            className={`mi-icon-button ${step === 'history' ? 'mi-icon-button-active' : ''}`}
+                            title="Lịch sử kiểm tra"
+                        >
+                            <History size={20} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="mi-wrapper">
                 {step === 'intro' && (
-                    <div className="premium-card p-10 text-center animate-in zoom-in duration-500">
-                        <div className="w-24 h-24 bg-blue-100 rounded-3xl flex items-center justify-center text-blue-600 mx-auto mb-8 transform rotate-6 hover:rotate-0 transition-transform duration-500">
+                    <div className="mi-card mi-intro-card">
+                        <div className="mi-intro-icon">
                             <Brain size={48} strokeWidth={2.5} />
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-4">Chào mừng bạn đến với bài test MI</h2>
-                        <p className="text-slate-600 leading-relaxed mb-8 max-w-lg mx-auto">
+                        <h2 className="mi-intro-title">Chào mừng bạn đến với bài test MI</h2>
+                        <p className="mi-intro-desc">
                             Dựa trên thuyết Trí thông minh Đa dạng của Howard Gardner, bài trắc nghiệm này giúp bạn xác định thế mạnh bản thân để lựa chọn nghề nghiệp phù hợp.
                         </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-10">
-                            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <CheckCircle2 className="text-green-500 mt-1 shrink-0" size={20} />
+                        <div className="mi-intro-grid">
+                            <div className="mi-intro-tile">
+                                <CheckCircle2 className="mi-tile-icon success" size={20} />
                                 <div>
-                                    <h4 className="font-bold text-slate-800">Cần khoảng 10 phút</h4>
-                                    <p className="text-sm text-slate-500">Trả lời thành thật với bản thân</p>
+                                    <h4>Cần khoảng 10 phút</h4>
+                                    <p>Trả lời thành thật với bản thân</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <AlertCircle className="text-blue-500 mt-1 shrink-0" size={20} />
+                            <div className="mi-intro-tile">
+                                <AlertCircle className="mi-tile-icon info" size={20} />
                                 <div>
-                                    <h4 className="font-bold text-slate-800">Không có câu trả lời sai</h4>
-                                    <p className="text-sm text-slate-500">Mỗi cá nhân là một phiên bản đặc biệt</p>
+                                    <h4>Không có câu trả lời sai</h4>
+                                    <p>Mỗi cá nhân là một phiên bản đặc biệt</p>
                                 </div>
                             </div>
                         </div>
 
                         <button
                             onClick={() => setStep('testing')}
-                            className="btn-premium px-12 py-4 text-lg font-bold"
+                            className="btn-premium mi-cta"
                         >
                             Bắt đầu ngay
                         </button>
@@ -193,56 +195,53 @@ export default function MITestPage() {
                 )}
 
                 {step === 'testing' && questions.length > 0 && (
-                    <div className="premium-card p-0 overflow-hidden shadow-2xl animate-in slide-in-from-right duration-500">
+                    <div className="mi-card mi-question-card">
                         {/* Progress bar */}
-                        <div className="h-2 w-full bg-slate-100">
+                        <div className="mi-progress">
                             <div
-                                className="h-full bg-blue-600 transition-all duration-500 ease-out shadow-sm"
+                                className="mi-progress-bar"
                                 style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                             ></div>
                         </div>
 
-                        <div className="p-10">
-                            <div className="flex justify-between items-center mb-10">
-                                <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-widest">
+                        <div className="mi-question-body">
+                            <div className="mi-question-meta">
+                                <span className="mi-question-index">
                                     Câu hỏi {currentQuestionIndex + 1} / {questions.length}
                                 </span>
-                                <div className="text-xs text-slate-400 font-bold uppercase overflow-hidden whitespace-nowrap">
+                                <div className="mi-question-type">
                                     {(MI_INTELLIGENCE_LABELS as any)[questions[currentQuestionIndex].intelligence_type]}
                                 </div>
                             </div>
 
-                            <div className="min-h-[120px] mb-12">
-                                <h3 className="text-2xl font-bold text-slate-800 leading-snug">
+                            <div className="mi-question-title">
+                                <h3>
                                     {questions[currentQuestionIndex].question_text}
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                            <div className="mi-answer-grid">
                                 {[1, 2, 3, 4, 5].map(score => (
                                     <button
                                         key={score}
                                         onClick={() => handleAnswer(questions[currentQuestionIndex].id, score)}
-                                        className={`py-6 rounded-2xl border-2 transition-all duration-300 font-bold text-lg ${answers[questions[currentQuestionIndex].id] === score
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-500/30 scale-105'
-                                            : 'bg-white border-slate-100 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
-                                            }`}
+                                        className={`mi-answer-btn ${answers[questions[currentQuestionIndex].id] === score ? 'active' : ''}`}
                                     >
-                                        {score}
-                                        <p className="text-[10px] mt-1 opacity-60 uppercase tracking-tighter">
+                                        <span className="mi-answer-score">{score}</span>
+                                        <span className="mi-answer-label">
                                             {score === 1 && 'Hoàn toàn sai'}
                                             {score === 3 && 'Trung bình'}
                                             {score === 5 && 'Hoàn toàn đúng'}
-                                        </p>
+                                        </span>
                                     </button>
                                 ))}
                             </div>
 
-                            <div className="flex justify-between mt-12 pt-8 border-t border-slate-100">
+                            <div className="mi-question-actions">
                                 <button
                                     onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                                     disabled={currentQuestionIndex === 0}
-                                    className="flex items-center gap-2 text-slate-400 hover:text-slate-800 disabled:opacity-30 font-bold transition-all"
+                                    className="mi-nav-btn muted"
                                 >
                                     <ChevronLeft size={20} /> Quay lại
                                 </button>
@@ -251,14 +250,14 @@ export default function MITestPage() {
                                     <button
                                         onClick={handleSubmit}
                                         disabled={submitting}
-                                        className="btn-premium px-10 py-3"
+                                        className="btn-premium mi-submit"
                                     >
                                         {submitting ? 'Đang phân tích...' : 'Xem kết quả'}
                                     </button>
                                 ) : (
                                     <button
                                         onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
-                                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-bold transition-all"
+                                        className="mi-nav-btn primary"
                                     >
                                         Câu tiếp theo <ChevronRight size={20} />
                                     </button>
@@ -269,13 +268,13 @@ export default function MITestPage() {
                 )}
 
                 {step === 'result' && results && (
-                    <div className="animate-in zoom-in duration-700">
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="mi-results">
+                        <div className="mi-results-grid">
                             {/* Left Column: Visual Result */}
-                            <div className="lg:col-span-2 premium-card p-8">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-xl font-bold text-slate-800">Bản đồ Trí thông minh</h3>
-                                    <Trophy className="text-yellow-500" size={28} />
+                            <div className="mi-card mi-result-card mi-chart-card">
+                                <div className="mi-card-header">
+                                    <h3>Bản đồ Trí thông minh</h3>
+                                    <Trophy className="mi-trophy" size={28} />
                                 </div>
 
                                 <div className="h-[400px] w-full">
@@ -302,33 +301,33 @@ export default function MITestPage() {
                             </div>
 
                             {/* Right Column: Top Strengths */}
-                            <div className="premium-card p-8">
-                                <h3 className="text-xl font-bold text-slate-800 mb-6 font-display">Điểm mạnh của bạn</h3>
-                                <div className="space-y-6">
+                            <div className="mi-card mi-result-card">
+                                <h3 className="mi-card-title">Điểm mạnh của bạn</h3>
+                                <div className="mi-strengths">
                                     {[...results.chartData].sort((a, b) => b.A - a.A).slice(0, 3).map((item, idx) => (
-                                        <div key={idx} className="p-4 bg-slate-50 rounded-2xl border-l-4 border-blue-600">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <span className="font-bold text-slate-800">{item.subject}</span>
-                                                <span className="text-xl font-black text-blue-600">{item.A}%</span>
+                                        <div key={idx} className="mi-strength-item">
+                                            <div className="mi-strength-header">
+                                                <span>{item.subject}</span>
+                                                <span className="mi-strength-score">{item.A}%</span>
                                             </div>
-                                            <div className="h-1.5 w-full bg-slate-200 rounded-full mt-2 overflow-hidden">
-                                                <div className="h-full bg-blue-600 rounded-full" style={{ width: `${item.A}%` }}></div>
+                                            <div className="mi-strength-bar">
+                                                <div style={{ width: `${item.A}%` }}></div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="mt-8 p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                    <p className="text-sm text-blue-800 font-medium leading-relaxed italic">
+                                <div className="mi-quote">
+                                    <p>
                                         "Mỗi người sinh ra đều mang trong mình những tài năng tiềm ẩn. Hãy tập trung phát huy thế mạnh vượt trội để đi xa hơn."
                                     </p>
                                 </div>
                             </div>
 
                             {/* Detailed breakdown */}
-                            <div className="lg:col-span-3 premium-card p-8">
-                                <h3 className="text-xl font-bold text-slate-800 mb-8">Chi tiết các loại trí thông minh</h3>
-                                <div className="h-[300px] w-full">
+                            <div className="mi-card mi-result-card mi-breakdown-card">
+                                <h3 className="mi-card-title">Chi tiết các loại trí thông minh</h3>
+                                <div className="mi-breakdown-chart">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={results.chartData}>
                                             <XAxis dataKey="subject" hide />
@@ -345,9 +344,9 @@ export default function MITestPage() {
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
-                                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mt-4 text-center">
+                                <div className="mi-breakdown-labels">
                                     {results.chartData.map((item: any, idx: number) => (
-                                        <div key={idx} className="text-[10px] font-bold text-slate-500 uppercase leading-tight px-1">
+                                        <div key={idx}>
                                             {item.subject}
                                         </div>
                                     ))}
@@ -355,16 +354,16 @@ export default function MITestPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-center mt-10 gap-4">
+                        <div className="mi-results-actions">
                             <button
                                 onClick={() => setStep('testing')}
-                                className="bg-white text-slate-800 border-2 border-slate-200 py-3 px-10 rounded-2xl font-bold hover:bg-slate-50 transition-all"
+                                className="mi-secondary-btn"
                             >
                                 Làm lại bài test
                             </button>
                             <button
                                 onClick={() => window.print()}
-                                className="bg-slate-800 text-white py-3 px-10 rounded-2xl font-bold hover:bg-slate-900 shadow-xl transition-all"
+                                className="mi-primary-btn"
                             >
                                 Xuất báo cáo PDF
                             </button>
@@ -373,24 +372,26 @@ export default function MITestPage() {
                 )}
 
                 {step === 'history' && (
-                    <div className="premium-card p-8 animate-in slide-in-from-bottom duration-500">
-                        <div className="flex items-center gap-3 mb-8">
-                            <History className="text-slate-400" />
-                            <h3 className="text-xl font-bold text-slate-800">Lịch sử trắc nghiệm</h3>
+                    <div className="mi-card mi-history-card">
+                        <div className="mi-card-header">
+                            <div className="mi-history-title">
+                                <History />
+                                <h3>Lịch sử trắc nghiệm</h3>
+                            </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="mi-history-list">
                             {history.length > 0 ? history.map((h, i) => (
-                                <div key={i} className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 transition-all border border-slate-100 group">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm font-black text-xs border border-slate-100 overflow-hidden">
+                                <div key={i} className="mi-history-item">
+                                    <div className="mi-history-info">
+                                        <div className="mi-history-date">
                                             {new Date(h.created_at).toLocaleDateString()}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-slate-800">Kết quả Trắc nghiệm MI</h4>
-                                            <div className="flex gap-2 mt-1">
+                                            <h4>Kết quả Trắc nghiệm MI</h4>
+                                            <div className="mi-history-tags">
                                                 {h.chart_data?.sort((a: any, b: any) => b.A - a.A).slice(0, 2).map((item: any, idx: number) => (
-                                                    <span key={idx} className="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded uppercase">
+                                                    <span key={idx}>
                                                         {item.subject}
                                                     </span>
                                                 ))}
@@ -405,22 +406,22 @@ export default function MITestPage() {
                                             });
                                             setStep('result');
                                         }}
-                                        className="p-3 bg-white text-blue-600 rounded-xl opacity-0 group-hover:opacity-100 shadow-sm border border-slate-200 transition-all"
+                                        className="mi-history-action"
                                     >
                                         <Trophy size={20} />
                                     </button>
                                 </div>
                             )) : (
-                                <div className="text-center py-16 text-slate-400">
+                                <div className="mi-history-empty">
                                     Bạn chưa thực hiện bài trắc nghiệm nào.
                                 </div>
                             )}
                         </div>
 
-                        <div className="mt-10 pt-8 border-t border-slate-100 flex justify-center">
+                        <div className="mi-history-footer">
                             <button
                                 onClick={() => setStep('intro')}
-                                className="bg-blue-600 text-white py-3 px-10 rounded-2xl font-bold shadow-lg hover:shadow-blue-500/30 transition-all"
+                                className="mi-primary-btn"
                             >
                                 Thực hiện bài test mới
                             </button>
@@ -431,19 +432,475 @@ export default function MITestPage() {
 
             <style>{`
                 .mi-test-container {
-                    background: #f8fafc;
+                    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
                     min-height: 100vh;
+                    padding: 28px 18px 60px;
                 }
-                .premium-card {
+                .mi-wrapper {
+                    max-width: 1120px;
+                    margin: 0 auto;
+                }
+                .mi-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 16px;
+                    margin-bottom: 24px;
+                }
+                .mi-title {
+                    font-size: clamp(1.6rem, 3vw, 2.2rem);
+                    font-weight: 900;
+                    color: #0f172a;
+                    letter-spacing: -0.03em;
+                    margin: 0;
+                }
+                .mi-subtitle {
+                    color: #64748b;
+                    font-weight: 600;
+                    margin-top: 6px;
+                }
+                .mi-header-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+                .mi-icon-button {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 14px;
+                    border: 1px solid #e2e8f0;
                     background: white;
-                    border-radius: 32px;
-                    border: 1px solid rgba(226, 232, 240, 0.8);
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.03);
+                    color: #475569;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                }
+                .mi-icon-button:hover {
+                    background: #f8fafc;
+                    color: #2563eb;
+                    border-color: #bfdbfe;
+                }
+                .mi-icon-button-active {
+                    background: #2563eb;
+                    color: white;
+                    border-color: #2563eb;
+                    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+                }
+                .mi-card {
+                    background: white;
+                    border-radius: 28px;
+                    border: 1px solid rgba(226, 232, 240, 0.9);
+                    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+                }
+                .mi-intro-card {
+                    text-align: center;
+                    padding: clamp(28px, 4vw, 48px);
+                }
+                .mi-intro-icon {
+                    width: 88px;
+                    height: 88px;
+                    background: #e0e7ff;
+                    border-radius: 24px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #2563eb;
+                    margin: 0 auto 28px;
+                    transform: rotate(4deg);
+                    transition: transform 0.4s ease;
+                }
+                .mi-intro-icon:hover {
+                    transform: rotate(0deg);
+                }
+                .mi-intro-title {
+                    font-size: 1.6rem;
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin-bottom: 12px;
+                }
+                .mi-intro-desc {
+                    color: #475569;
+                    line-height: 1.7;
+                    max-width: 620px;
+                    margin: 0 auto 28px;
+                }
+                .mi-intro-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                    gap: 16px;
+                    text-align: left;
+                    margin-bottom: 32px;
+                }
+                .mi-intro-tile {
+                    display: flex;
+                    gap: 14px;
+                    align-items: flex-start;
+                    padding: 16px;
+                    border-radius: 18px;
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                }
+                .mi-intro-tile h4 {
+                    font-weight: 700;
+                    color: #0f172a;
+                    margin: 0 0 4px;
+                }
+                .mi-intro-tile p {
+                    font-size: 0.9rem;
+                    color: #64748b;
+                    margin: 0;
+                }
+                .mi-tile-icon {
+                    margin-top: 2px;
+                }
+                .mi-tile-icon.success {
+                    color: #22c55e;
+                }
+                .mi-tile-icon.info {
+                    color: #3b82f6;
+                }
+                .mi-cta {
+                    padding: 14px 36px;
+                    font-size: 1rem;
+                }
+                .mi-question-card {
+                    overflow: hidden;
+                }
+                .mi-progress {
+                    height: 8px;
+                    width: 100%;
+                    background: #e2e8f0;
+                }
+                .mi-progress-bar {
+                    height: 100%;
+                    background: linear-gradient(90deg, #2563eb, #60a5fa);
+                    transition: width 0.4s ease;
+                }
+                .mi-question-body {
+                    padding: clamp(24px, 4vw, 40px);
+                }
+                .mi-question-meta {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 28px;
+                }
+                .mi-question-index {
+                    padding: 6px 14px;
+                    background: #e0e7ff;
+                    color: #2563eb;
+                    border-radius: 999px;
+                    font-size: 0.75rem;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                }
+                .mi-question-type {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                }
+                .mi-question-title h3 {
+                    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+                    color: #0f172a;
+                    font-weight: 800;
+                    margin: 0 0 24px;
+                    line-height: 1.4;
+                }
+                .mi-answer-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                    gap: 14px;
+                }
+                .mi-answer-btn {
+                    border: 2px solid #e2e8f0;
+                    border-radius: 18px;
+                    padding: 18px 12px;
+                    background: white;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                }
+                .mi-answer-btn:hover {
+                    border-color: #93c5fd;
+                    background: #eff6ff;
+                }
+                .mi-answer-btn.active {
+                    border-color: #2563eb;
+                    background: #2563eb;
+                    color: white;
+                    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.3);
+                    transform: translateY(-2px);
+                }
+                .mi-answer-score {
+                    font-size: 1.4rem;
+                    font-weight: 800;
+                }
+                .mi-answer-label {
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: inherit;
+                    opacity: 0.7;
+                }
+                .mi-question-actions {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding-top: 24px;
+                    margin-top: 24px;
+                    border-top: 1px solid #e2e8f0;
+                }
+                .mi-nav-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 700;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                }
+                .mi-nav-btn.muted {
+                    color: #94a3b8;
+                }
+                .mi-nav-btn.primary {
+                    color: #2563eb;
+                }
+                .mi-submit {
+                    padding: 12px 28px;
+                }
+                .mi-results {
+                    animation: fadeIn 0.4s ease;
+                }
+                .mi-results-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 20px;
+                }
+                .mi-result-card {
+                    padding: 28px;
+                }
+                .mi-chart-card {
+                    grid-column: span 2;
+                }
+                .mi-card-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 24px;
+                }
+                .mi-card-header h3 {
+                    margin: 0;
+                    font-size: 1.2rem;
+                    font-weight: 800;
+                    color: #0f172a;
+                }
+                .mi-trophy {
+                    color: #f59e0b;
+                }
+                .mi-card-title {
+                    font-size: 1.2rem;
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin: 0 0 20px;
+                }
+                .mi-strengths {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+                .mi-strength-item {
+                    padding: 16px;
+                    border-radius: 16px;
+                    background: #f8fafc;
+                    border-left: 4px solid #2563eb;
+                }
+                .mi-strength-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
+                .mi-strength-score {
+                    color: #2563eb;
+                    font-size: 1.1rem;
+                }
+                .mi-strength-bar {
+                    height: 6px;
+                    background: #e2e8f0;
+                    border-radius: 999px;
+                    overflow: hidden;
+                }
+                .mi-strength-bar div {
+                    height: 100%;
+                    background: #2563eb;
+                    border-radius: inherit;
+                }
+                .mi-quote {
+                    margin-top: 24px;
+                    padding: 16px;
+                    border-radius: 16px;
+                    background: #eff6ff;
+                    border: 1px solid #bfdbfe;
+                    color: #1e3a8a;
+                    font-size: 0.9rem;
+                    font-style: italic;
+                }
+                .mi-breakdown-card {
+                    grid-column: span 3;
+                }
+                .mi-breakdown-chart {
+                    height: 280px;
+                }
+                .mi-breakdown-labels {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                    gap: 8px;
+                    margin-top: 16px;
+                    text-align: center;
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                }
+                .mi-results-actions {
+                    display: flex;
+                    justify-content: center;
+                    gap: 12px;
+                    margin-top: 24px;
+                    flex-wrap: wrap;
+                }
+                .mi-primary-btn {
+                    background: #0f172a;
+                    color: white;
+                    border: none;
+                    padding: 12px 28px;
+                    border-radius: 18px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
+                }
+                .mi-secondary-btn {
+                    background: white;
+                    border: 2px solid #e2e8f0;
+                    padding: 12px 28px;
+                    border-radius: 18px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    cursor: pointer;
+                }
+                .mi-history-card {
+                    padding: 28px;
+                }
+                .mi-history-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    color: #64748b;
+                }
+                .mi-history-title h3 {
+                    margin: 0;
+                    color: #0f172a;
+                    font-size: 1.2rem;
+                    font-weight: 800;
+                }
+                .mi-history-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+                .mi-history-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 16px;
+                    border-radius: 18px;
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    transition: all 0.2s ease;
+                }
+                .mi-history-item:hover {
+                    background: white;
+                    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+                }
+                .mi-history-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                }
+                .mi-history-date {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 16px;
+                    background: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 800;
+                    font-size: 0.7rem;
+                    color: #2563eb;
+                    border: 1px solid #e2e8f0;
+                }
+                .mi-history-info h4 {
+                    margin: 0;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
+                .mi-history-tags {
+                    display: flex;
+                    gap: 6px;
+                    margin-top: 6px;
+                }
+                .mi-history-tags span {
+                    font-size: 0.65rem;
+                    background: #dbeafe;
+                    color: #1d4ed8;
+                    padding: 2px 8px;
+                    border-radius: 999px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                }
+                .mi-history-action {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 14px;
+                    border: 1px solid #e2e8f0;
+                    background: white;
+                    color: #2563eb;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0.85;
+                }
+                .mi-history-action:hover {
+                    opacity: 1;
+                    box-shadow: 0 12px 20px rgba(37, 99, 235, 0.2);
+                }
+                .mi-history-empty {
+                    text-align: center;
+                    padding: 40px 0;
+                    color: #94a3b8;
+                }
+                .mi-history-footer {
+                    margin-top: 28px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                    display: flex;
+                    justify-content: center;
                 }
                 .btn-premium {
                     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                     color: white;
-                    border-radius: 20px;
+                    border-radius: 18px;
                     box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
                     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                     border: none;
@@ -455,6 +912,33 @@ export default function MITestPage() {
                 }
                 .btn-premium:active {
                     transform: translateY(0);
+                }
+                @media (max-width: 1024px) {
+                    .mi-results-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    .mi-chart-card,
+                    .mi-breakdown-card {
+                        grid-column: span 1;
+                    }
+                }
+                @media (max-width: 640px) {
+                    .mi-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                    .mi-question-actions {
+                        flex-direction: column;
+                        gap: 12px;
+                    }
+                    .mi-history-item {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 12px;
+                    }
+                    .mi-history-action {
+                        align-self: flex-end;
+                    }
                 }
             `}</style>
         </div>
